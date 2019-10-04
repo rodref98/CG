@@ -4,7 +4,7 @@ var camera1, scene, renderer;
 
 var geometry, material, mesh;
 
-var table, target;
+var table, target, arm;
 function addTableLeg(obj, x, y, z) {
     'use strict';
 
@@ -61,6 +61,39 @@ function addTableArtic1(obj, x, y, z){
 }
 
 
+function addArm1(obj,x,y,z){
+    'use strict';
+    material = new THREE.MeshBasicMaterial({ color:0xff8533 , wireframe: true });
+    geometry = new THREE.CubeGeometry(4, 22, 4);
+    mesh = new THREE.Mesh(geometry, material);
+    mesh.position.set(x, y, z);
+    obj.add(mesh);
+}
+
+function addArm2(obj,x,y,z){
+    'use strict';
+    material = new THREE.MeshBasicMaterial({ color:0xff8533 , wireframe: true });
+    geometry = new THREE.CubeGeometry(22,4 , 4);
+    mesh = new THREE.Mesh(geometry, material);
+    mesh.position.set(x, y, z);
+    obj.add(mesh);
+}
+
+function addArmArtic(obj,x,y,z){
+    material = new THREE.MeshBasicMaterial( { color: 0xffff00, wireframe: true } );
+    geometry = new THREE.SphereBufferGeometry(4, 8, 6, 0);
+    material.side = THREE.DoubleSide;
+    mesh = new THREE.Mesh(geometry, material);
+    mesh.position.set(x, y, z);
+    obj.add(mesh);
+    
+}
+
+
+
+
+
+
 function createTable(x, y, z) {
     'use strict';
     
@@ -98,6 +131,21 @@ function createTarget(x, y, z) {
     target.position.y = y;
     target.position.z = z;
 }
+function createArm(x,y,z){
+    arm = new THREE.Object3D();
+
+    material = new THREE.MeshBasicMaterial({ color:0xff8533 , wireframe: true });
+
+    addArm1(arm,0,12,0);
+    addArm2(arm,0,24,0);
+    addArmArtic(arm,0,24,0);
+    
+
+    scene.add(arm);
+    arm.position.x = x;
+    arm.position.y = y;
+    arm.position.z = z;
+}
 
 
 function createScene() {
@@ -111,6 +159,7 @@ function createScene() {
 
     createTable(-25, 0, 0);
     createTarget(55, 0, 0);
+    createArm(-25,0,0);
     
     
     
