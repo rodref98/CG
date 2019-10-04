@@ -164,7 +164,9 @@ function switch_camera(number) {
 	active_camera = number;
 }
 
-
+function table_movement(){
+  table.translateX(0.5);
+}
 
 function onResize() {
     'use strict';
