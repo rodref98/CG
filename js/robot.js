@@ -130,10 +130,41 @@ function createCamera() {
 
     
     camera1[0].position.x =0;
-    camera1[0].position.y = 0;
-    camera1[0].position.z = 100;
+    camera1[0].position.y = 100;
+    camera1[0].position.z = 25;
     camera1[0].lookAt(scene.position);
 }
+
+function createCamera2() {
+    'use strict';
+
+    camera1[1] = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, 1000);
+
+    
+    camera1[1].position.x =0;
+    camera1[1].position.y = 0;
+    camera1[1].position.z = 100;
+    camera1[1].lookAt(scene.position);
+}
+
+//por camara frontal a funcionar com os valores certos (rotacao)
+function createCamera3() {
+    'use strict';
+
+    camera1[2] = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, 1000);
+
+    
+    camera1[2].position.x =10;
+    camera1[2].position.y = 100;
+    camera1[2].position.z = 150;
+    camera1[2].lookAt(scene.position);
+}
+
+function switch_camera(number) {
+	active_camera = number;
+}
+
+
 
 function onResize() {
     'use strict';
@@ -159,17 +190,15 @@ function onKeyDown(e) {
         });
         break;
     case 50: //2
-        camera1.position.x = 0;
-        camera1.position.y = 20;
-        camera1.position.z = 75;
-        camera1.lookAt(scene.position);
+        switch_camera(0);
         break;
 
     case 49: //1
-        camera1.position.x =0;
-        camera1.position.y = 100;
-        camera1.position.z = 25;
-        camera1.lookAt(scene.position);
+        switch_camera(1);
+        break;
+
+    case 51: //3
+        switch_camera(2);
         break;
 
     case 39:
@@ -185,12 +214,21 @@ function onKeyDown(e) {
         });
         break;
     }
-    render();
 }
 
 function render() {
-    'use strict';
-    renderer.render(scene, camera1);
+	renderer.render(scene, camera1[active_camera]);
+}
+
+
+
+function animate() {
+	//Checks for keyboard input for movement
+	//checkMove();
+	//Renders Scene
+	render();
+
+	requestAnimationFrame(animate);
 }
 
 function init() {
@@ -203,9 +241,8 @@ function init() {
    
     createScene();
     createCamera();
-    camera1.lookAt(scene.position);
-    
-    render(camera1);
+    createCamera2();
+    createCamera3();
     
     window.addEventListener("keydown", onKeyDown);
     window.addEventListener("resize", onResize);
