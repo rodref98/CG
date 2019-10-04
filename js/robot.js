@@ -23,49 +23,42 @@ function addTableTop(obj, x, y, z) {
     obj.add(mesh);
 }
 
-function createTargetBase(x, y, z) {
+function addTargetBase(obj, x, y, z) {
     'use strict';
     
-    cilinder = new THREE.Object3D();
-    
-    material = new THREE.MeshBasicMaterial({ color: 0xff0000, wireframe: true });
     geometry = new THREE.CylinderGeometry(10, 10, 30, 32);
     mesh = new THREE.Mesh(geometry, material);
     
-    cilinder.add(mesh);
-    cilinder.position.set(x, y, z);
+    obj.add(mesh);
+    mesh.position.set(x, y, z);
     
-    scene.add(cilinder);
+    obj.add(mesh);
 }
 
-function createTargetTorus(x, y, z){
+function addTargetTorus(obj, x, y, z){
     'use strict';
-
-    torus = new THREE.Object3D();
 
     material = new THREE.MeshBasicMaterial( { color: 0xffff00, wireframe: true } );
     geometry = new THREE.TorusGeometry( 5, 0.8, 16, 50 );
-    torus = new THREE.Mesh( geometry, material );
+    mesh = new THREE.Mesh( geometry, material );
+    mesh.position.set(x, y, z);
+    obj.add(mesh);
+    
 
-    torus.add(mesh);
-    torus.position.set(x, y, z);
-
-    scene.add(torus);
 }
 
 
-function createArtic(x, y, z){
-    artic = new THREE.Object3D();
+function addTableArtic1(obj, x, y, z){
 
     material = new THREE.MeshBasicMaterial( { color: 0xffff00, wireframe: true } );
     geometry = new THREE.SphereBufferGeometry(5, 8, 6, 0, 2*Math.PI, 0, 0.5 * Math.PI);
     material.side = THREE.DoubleSide;
-    artic = new THREE.Mesh(geometry, material);
+    mesh = new THREE.Mesh(geometry, material);
+    mesh.position.set(x, y, z);
+    obj.add(mesh);
+    
 
-    artic.add(mesh);
-    artic.position.set(x, y, z);
-
-    scene.add(artic);
+    //scene.add(artic);
 }
 
 
@@ -81,6 +74,7 @@ function createTable(x, y, z) {
     addTableLeg(table, -50, 0, 8);
     addTableLeg(table, 0, 0, 8);
     addTableLeg(table, 0, 0, -8);
+    addTableArtic1(table, -25, 1, 0);
     
     scene.add(table);
     
@@ -88,6 +82,24 @@ function createTable(x, y, z) {
     table.position.y = y;
     table.position.z = z;
 }
+function createTarget(x, y, z) {
+    'use strict';
+    
+    var target = new THREE.Object3D();
+    
+    material = new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: true });
+   
+    addTargetBase(target, 35, 0, 0);
+    addTargetTorus(target, 35, 20, 0);
+    
+
+    scene.add(target);
+    
+    target.position.x = x;
+    target.position.y = y;
+    target.position.z = z;
+}
+
 
 function createScene() {
     'use strict';
@@ -97,11 +109,12 @@ function createScene() {
 
     scene.add(new THREE.AxisHelper(10));
     
-    createTargetTorus(45, 30, 0);
-    createArtic(-25, 2, 0);
+    //createTargetTorus(45, 30, 0);
+
     createTable(0, 0, 0);
+    createTarget(35, 10, 0);
     
-    createTargetBase(45, 10, 0);
+    //createTargetBase(45, 10, 0);
     
     
 }
@@ -156,6 +169,10 @@ function onKeyDown(e) {
         camera1.position.y = 100;
         camera1.position.z = 25;
         camera1.lookAt(scene.position);
+        break;
+
+    case 39:
+        artic.rotateX(2);
         break;
     case 69:  //E
     case 101: //e
