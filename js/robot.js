@@ -88,8 +88,8 @@ function createTarget(x, y, z) {
     
     material = new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: true });
    
-    addTargetBase(target, 35, 0, 0);
-    addTargetTorus(target, 35, 20, 0);
+    addTargetBase(target, 0, 10, 0);
+    addTargetTorus(target, 0, 30, 0);
     
 
     scene.add(target);
@@ -109,8 +109,8 @@ function createScene() {
     scene.add(new THREE.AxisHelper(100));
 
 
-    createTable(-20, 0, 0);
-    createTarget(35, 10, 0);
+    createTable(-25, 0, 0);
+    createTarget(55, 0, 0);
     
     
     
@@ -170,6 +170,7 @@ function onKeyDown(e) {
 
     case 39:
         table.rotateY(0.5);
+        target.rotateY(0.5);
         break;
     case 69:  //E
     case 101: //e
