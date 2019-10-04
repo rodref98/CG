@@ -11,7 +11,7 @@ var scene, renderer;
 
 var geometry, material, mesh;
 
-var table, target;
+var table, target, arm;
 function addTableLeg(obj, x, y, z) {
     'use strict';
 
@@ -32,7 +32,7 @@ function addTableTop(obj, x, y, z) {
 function addTargetBase(obj, x, y, z) {
     'use strict';
 
-    geometry = new THREE.CylinderGeometry(10, 10, 30, 32);
+    geometry = new THREE.CylinderGeometry(7, 7, 30, 32);
     mesh = new THREE.Mesh(geometry, material);
 
     obj.add(mesh);
@@ -45,7 +45,7 @@ function addTargetTorus(obj, x, y, z){
     'use strict';
 
     material = new THREE.MeshBasicMaterial( { color: 0xffff00, wireframe: true } );
-    geometry = new THREE.TorusGeometry( 5, 0.8, 16, 50 );
+    geometry = new THREE.TorusGeometry( 5, 1, 16, 50 );
     mesh = new THREE.Mesh( geometry, material );
     mesh.position.set(x, y, z);
     obj.add(mesh);
@@ -65,6 +65,62 @@ function addTableArtic1(obj, x, y, z){
 
 
     //scene.add(artic);
+}
+
+
+function addArm1(obj,x,y,z){
+    'use strict';
+    material = new THREE.MeshBasicMaterial({ color:0xffffff , wireframe: true });
+    geometry = new THREE.CubeGeometry(4, 22, 4);
+    mesh = new THREE.Mesh(geometry, material);
+    mesh.position.set(x, y, z);
+    obj.add(mesh);
+}
+
+function addArm2(obj,x,y,z){
+    'use strict';
+    material = new THREE.MeshBasicMaterial({ color:0xffffff , wireframe: true });
+    geometry = new THREE.CubeGeometry(22,4,4);
+    mesh = new THREE.Mesh(geometry, material);
+    mesh.position.set(x, y, z);
+    obj.add(mesh);
+}
+
+function addHand(obj,x,y,z){
+    'use strict';
+    material = new THREE.MeshBasicMaterial({ color:0xffffff , wireframe: true });
+    geometry = new THREE.CubeGeometry(4,12,4);
+    mesh = new THREE.Mesh(geometry, material);
+    mesh.position.set(x, y, z);
+    obj.add(mesh);
+}
+
+function addArmArtic(obj,x,y,z){
+    material = new THREE.MeshBasicMaterial( { color: 0xffff00, wireframe: true } );
+    geometry = new THREE.SphereBufferGeometry(4, 8, 6, 0);
+    material.side = THREE.DoubleSide;
+    mesh = new THREE.Mesh(geometry, material);
+    mesh.position.set(x, y, z);
+    obj.add(mesh);
+    
+}
+
+function addHandArtic(obj,x,y,z){
+    material = new THREE.MeshBasicMaterial( { color: 0xffff00, wireframe: true } );
+    geometry = new THREE.SphereBufferGeometry(4, 8, 6, 0);
+    material.side = THREE.DoubleSide;
+    mesh = new THREE.Mesh(geometry, material);
+    mesh.position.set(x, y, z);
+    obj.add(mesh);
+}
+
+function addFinger(obj,x,y,z){
+    'use strict';
+    material = new THREE.MeshBasicMaterial({ color:0xffffff , wireframe: true });
+    geometry = new THREE.CubeGeometry(10,2,2);
+    mesh = new THREE.Mesh(geometry, material);
+    mesh.position.set(x, y, z);
+    obj.add(mesh);
 }
 
 
@@ -93,7 +149,7 @@ function createTarget(x, y, z) {
 
     target = new THREE.Object3D();
 
-    material = new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: true });
+    material = new THREE.MeshBasicMaterial({ color: 0x1E90FF, wireframe: true });
 
     addTargetBase(target, 0, 10, 0);
     addTargetTorus(target, 0, 30, 0);
@@ -104,6 +160,25 @@ function createTarget(x, y, z) {
     target.position.x = x;
     target.position.y = y;
     target.position.z = z;
+}
+function createArm(x,y,z){
+    arm = new THREE.Object3D();
+
+    material = new THREE.MeshBasicMaterial({ color:0xff8533 , wireframe: true });
+
+    addArm1(arm,0,12,0);
+    addArm2(arm,12,24,0);
+    addHand(arm,29,24,0);
+    addFinger(arm,32,28,0);
+    addFinger(arm,32,20,0);
+    addHandArtic(arm,24,24,0);
+    addArmArtic(arm,0,24,0);
+    
+
+    scene.add(arm);
+    arm.position.x = x;
+    arm.position.y = y;
+    arm.position.z = z;
 }
 
 
@@ -118,8 +193,8 @@ function createScene() {
 
     createTable(-25, 0, 0);
     createTarget(55, 0, 0);
-
-
+    createArm(-25,0,0);
+    
 
 }
 
@@ -204,12 +279,12 @@ function onKeyDown(e) {
         break;
 
     case 37://left arrow
-        table.rotateY(-0.5);
+        table.rotateY(-0.05);
         break;
     case 38://forward arrow
         table_movement();
     case 39://right arrow
-        table.rotateY(0.5);
+        table.rotateY(0.05);
         break;
     case 69:  //E
     case 101: //e
