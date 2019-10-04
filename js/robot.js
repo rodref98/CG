@@ -135,6 +135,10 @@ function createCamera() {
     camera1[0].lookAt(scene.position);
 }
 
+function table_movement(){
+    table.translateX(1);
+}
+
 function onResize() {
     'use strict';
 
@@ -176,6 +180,7 @@ function onKeyDown(e) {
         table.rotateY(-0.5);
         break;
     case 38://forward arrow
+        table_movement();
     case 39://right arrow
         table.rotateY(0.5);
         break;
