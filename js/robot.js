@@ -4,8 +4,7 @@ var camera1, scene, renderer;
 
 var geometry, material, mesh;
 
-var cilinder, torus, artic;
-
+var table, target;
 function addTableLeg(obj, x, y, z) {
     'use strict';
 
@@ -65,16 +64,16 @@ function addTableArtic1(obj, x, y, z){
 function createTable(x, y, z) {
     'use strict';
     
-    var table = new THREE.Object3D();
+    table = new THREE.Object3D();
     
     material = new THREE.MeshBasicMaterial({ color: 0x00ff00, wireframe: true });
    
-    addTableTop(table, -25, 0, 0);
-    addTableLeg(table, -50, 0, -8);
-    addTableLeg(table, -50, 0, 8);
-    addTableLeg(table, 0, 0, 8);
-    addTableLeg(table, 0, 0, -8);
-    addTableArtic1(table, -25, 1, 0);
+    addTableTop(table, 0, 0, 0);
+    addTableLeg(table, -25, 0, -8);
+    addTableLeg(table, -25, 0, 8);
+    addTableLeg(table, 25, 0, 8);
+    addTableLeg(table, 25, 0, -8);
+    addTableArtic1(table, 0, 1, 0);
     
     scene.add(table);
     
@@ -85,7 +84,7 @@ function createTable(x, y, z) {
 function createTarget(x, y, z) {
     'use strict';
     
-    var target = new THREE.Object3D();
+    target = new THREE.Object3D();
     
     material = new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: true });
    
@@ -107,14 +106,12 @@ function createScene() {
     scene = new THREE.Scene();
     
 
-    scene.add(new THREE.AxisHelper(10));
-    
-    //createTargetTorus(45, 30, 0);
+    scene.add(new THREE.AxisHelper(100));
 
-    createTable(0, 0, 0);
+
+    createTable(-20, 0, 0);
     createTarget(35, 10, 0);
     
-    //createTargetBase(45, 10, 0);
     
     
 }
@@ -172,7 +169,7 @@ function onKeyDown(e) {
         break;
 
     case 39:
-        artic.rotateX(2);
+        table.rotateY(0.5);
         break;
     case 69:  //E
     case 101: //e
