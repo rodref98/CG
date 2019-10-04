@@ -31,13 +31,13 @@ function addTableTop(obj, x, y, z) {
 
 function addTargetBase(obj, x, y, z) {
     'use strict';
-    
+
     geometry = new THREE.CylinderGeometry(10, 10, 30, 32);
     mesh = new THREE.Mesh(geometry, material);
-    
+
     obj.add(mesh);
     mesh.position.set(x, y, z);
-    
+
     obj.add(mesh);
 }
 
@@ -49,7 +49,7 @@ function addTargetTorus(obj, x, y, z){
     mesh = new THREE.Mesh( geometry, material );
     mesh.position.set(x, y, z);
     obj.add(mesh);
-    
+
 
 }
 
@@ -62,7 +62,7 @@ function addTableArtic1(obj, x, y, z){
     mesh = new THREE.Mesh(geometry, material);
     mesh.position.set(x, y, z);
     obj.add(mesh);
-    
+
 
     //scene.add(artic);
 }
@@ -70,37 +70,37 @@ function addTableArtic1(obj, x, y, z){
 
 function createTable(x, y, z) {
     'use strict';
-    
+
     table = new THREE.Object3D();
-    
+
     material = new THREE.MeshBasicMaterial({ color: 0x00ff00, wireframe: true });
-   
+
     addTableTop(table, 0, 0, 0);
     addTableLeg(table, -25, 0, -8);
     addTableLeg(table, -25, 0, 8);
     addTableLeg(table, 25, 0, 8);
     addTableLeg(table, 25, 0, -8);
     addTableArtic1(table, 0, 1, 0);
-    
+
     scene.add(table);
-    
+
     table.position.x = x;
     table.position.y = y;
     table.position.z = z;
 }
 function createTarget(x, y, z) {
     'use strict';
-    
+
     target = new THREE.Object3D();
-    
+
     material = new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: true });
-   
+
     addTargetBase(target, 0, 10, 0);
     addTargetTorus(target, 0, 30, 0);
-    
+
 
     scene.add(target);
-    
+
     target.position.x = x;
     target.position.y = y;
     target.position.z = z;
@@ -109,18 +109,18 @@ function createTarget(x, y, z) {
 
 function createScene() {
     'use strict';
-    
+
     scene = new THREE.Scene();
-    
+
 
     scene.add(new THREE.AxisHelper(100));
 
 
     createTable(-25, 0, 0);
     createTarget(55, 0, 0);
-    
-    
-    
+
+
+
 }
 
 function createCamera() {
@@ -128,7 +128,7 @@ function createCamera() {
 
     camera1[0] = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, 1000);
 
-    
+
     camera1[0].position.x =0;
     camera1[0].position.y = 100;
     camera1[0].position.z = 25;
@@ -170,7 +170,7 @@ function onResize() {
     'use strict';
 
     renderer.setSize(window.innerWidth, window.innerHeight);
-    
+
     if (window.innerHeight > 0 && window.innerWidth > 0) {
         camera1.aspect = window.innerWidth / window.innerHeight;
         camera1.updateProjectionMatrix();
@@ -180,7 +180,7 @@ function onResize() {
 
 function onKeyDown(e) {
     'use strict';
-    
+
     switch (e.keyCode) {
     case 52: //4
         scene.traverse(function (node) {
@@ -201,9 +201,12 @@ function onKeyDown(e) {
         switch_camera(2);
         break;
 
-    case 39:
+    case 37://left arrow
+        table.rotateY(-0.5);
+        break;
+    case 38://forward arrow
+    case 39://right arrow
         table.rotateY(0.5);
-        target.rotateY(0.5);
         break;
     case 69:  //E
     case 101: //e
@@ -238,7 +241,7 @@ function init() {
     });
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
-   
+
     createScene();
     createCamera();
     createCamera2();
@@ -247,5 +250,3 @@ function init() {
     window.addEventListener("keydown", onKeyDown);
     window.addEventListener("resize", onResize);
 }
-
-
