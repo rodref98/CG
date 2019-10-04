@@ -1,6 +1,13 @@
 /*global THREE, requestAnimationFrame, console*/
 
-var camera1, scene, renderer;
+
+
+var camera1 = new Array(3);
+var active_camera = 0;
+
+
+
+var scene, renderer;
 
 var geometry, material, mesh;
 
@@ -119,16 +126,13 @@ function createScene() {
 function createCamera() {
     'use strict';
 
-    camera1 = new THREE.PerspectiveCamera(70,
-                                            window.innerWidth / window.innerHeight,
-                                            1,
-                                            1000);
+    camera1[0] = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, 1000);
 
 
-    camera1.position.x =0;
-    camera1.position.y = 0;
-    camera1.position.z = 100;
-    //camera.lookAt(scene.position);
+    camera1[0].position.x =0;
+    camera1[0].position.y = 0;
+    camera1[0].position.z = 100;
+    camera1[0].lookAt(scene.position);
 }
 
 function onResize() {
@@ -168,10 +172,11 @@ function onKeyDown(e) {
         camera1.lookAt(scene.position);
         break;
 
-    case 37://seta esquerda
+    case 37://left arrow
         table.rotateY(-0.5);
         break;
-    case 39://seta direita
+    case 38://forward arrow
+    case 39://right arrow
         table.rotateY(0.5);
         break;
     case 69:  //E
