@@ -102,7 +102,7 @@ function addArmArtic(obj,x,y,z){
     mesh = new THREE.Mesh(geometry, material);
     mesh.position.set(x, y, z);
     obj.add(mesh);
-    
+
 }
 
 function addHandArtic(obj,x,y,z){
@@ -173,7 +173,7 @@ function createArm(x,y,z){
     addFinger(arm,32,20,0);
     addHandArtic(arm,24,24,0);
     addArmArtic(arm,0,24,0);
-    
+
 
     scene.add(arm);
     arm.position.x = x;
@@ -194,7 +194,7 @@ function createScene() {
     createTable(-25, 0, 0);
     createTarget(55, 0, 0);
     createArm(-25,0,0);
-    
+
 
 }
 
@@ -296,7 +296,9 @@ function onKeyDown(e) {
         break;
     }
 }
-
+function checkMove() {
+  
+}
 function render() {
 	renderer.render(scene, camera1[active_camera]);
 }
