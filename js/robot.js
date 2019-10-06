@@ -5,6 +5,7 @@
 var camera1 = new Array(3);
 var active_camera = 0;
 
+var fullrobot = new THREE.Object3D();
 var moveForward = false;
 var moveBackwards = false;
 var breakFB = false;
@@ -140,11 +141,11 @@ function createTable(x, y, z) {
     addTableLeg(table, 25, 0, -8);
     addTableArtic1(table, 0, 1, 0);
 
-    scene.add(table);
 
     table.position.x = x;
     table.position.y = y;
     table.position.z = z;
+    fullrobot.add(table);
 }
 function createTarget(x, y, z) {
     'use strict';
@@ -177,12 +178,19 @@ function createArm(x,y,z){
     addArmArtic(arm,0,24,0);
 
 
-    scene.add(arm);
     arm.position.x = x;
     arm.position.y = y;
     arm.position.z = z;
+    fullrobot.add(arm);
 }
 
+function createFullRobot(x, y, z){
+  scene.add(fullrobot);
+
+  fullrobot.position.x = x;
+  fullrobot.position.y = y;
+  fullrobot.position.z = z;
+}
 
 function createScene() {
     'use strict';
@@ -196,7 +204,7 @@ function createScene() {
     createTable(-25, 0, 0);
     createTarget(55, 0, 0);
     createArm(-25,0,0);
-
+    createFullRobot(0, 0, 0)
 
 }
 
@@ -278,15 +286,13 @@ function onKeyDown(e) {
         break;
 
     case 37://left arrow
-        table.rotateY(0.05);
-        arm.rotateY(0.05);
+        fullrobot.rotateY(0.05);
         break;
     case 38://forward arrow
         moveForward = true;
         break;
     case 39://right arrow
-        table.rotateY(-0.05);
-        arm.rotateY(-0.05);
+        fullrobot.rotateY(-0.05);
         break;
     case 40://backwards arrow
         moveBackwards = true;
@@ -330,18 +336,15 @@ function onKeyUp(e) {
 function checkMove() {
 
   if (moveForward){
-    table.translateX(1);
-    arm.translateX(1);
+    fullrobot.translateX(1);
   }
 
   else if (moveBackwards){
-    table.translateX(-1);
-    arm.translateX(-1);
+    fullrobot.translateX(-1);
   }
 
   else if (breakFB){
-    table.translateX(0);
-    arm.translateX(0);
+    fullrobot.translateX(0);
   }
 }
 function render() {
