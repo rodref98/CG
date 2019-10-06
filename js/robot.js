@@ -278,20 +278,32 @@ function onKeyDown(e) {
         break;
 
     case 37://left arrow
-        table.rotateY(-0.05);
-        arm.rotateY(-0.05);
+        table.rotateY(0.05);
+        arm.rotateY(0.05);
         break;
     case 38://forward arrow
         moveForward = true;
         break;
     case 39://right arrow
-        table.rotateY(0.05);
-        arm.rotateY(0.05);
+        table.rotateY(-0.05);
+        arm.rotateY(-0.05);
         break;
     case 40://backwards arrow
         moveBackwards = true;
         break;
+    case 65: //a
+        arm.rotateY(0.05);
+        break;
+    case 68: //d
+        arm.rotateY(-0.05);
+        break;
     case 69:  //E
+    case 83: //s
+        arm.rotateZ(0.05);
+        break;
+    case 87: //w
+        arm.rotateZ(-0.05);
+        break;
     case 101: //e
         scene.traverse(function (node) {
             if (node instanceof THREE.AxisHelper) {
