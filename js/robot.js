@@ -5,7 +5,9 @@
 var camera1 = new Array(3);
 var active_camera = 0;
 
-
+var moveForward = false;
+var moveBackwards = false;
+var breakFB = false;
 
 var scene, renderer;
 
@@ -239,9 +241,6 @@ function switch_camera(number) {
 	active_camera = number;
 }
 
-function table_movement(){
-  table.translateX(0.5);
-}
 
 function onResize() {
     'use strict';
@@ -282,9 +281,13 @@ function onKeyDown(e) {
         table.rotateY(-0.05);
         break;
     case 38://forward arrow
-        table_movement();
+        moveForward = true;
+        break;
     case 39://right arrow
         table.rotateY(0.05);
+        break;
+    case 40://backwards arrow
+        moveBackwards = true;
         break;
     case 69:  //E
     case 101: //e
@@ -296,8 +299,31 @@ function onKeyDown(e) {
         break;
     }
 }
+
+function onKeyUp(e) {
+  switch (e.keyCode) {
+    case 38:
+      moveForward = false;
+      breakFB = true;
+      break;
+    case 40:
+      moveBackwards = false;
+      breakFB = true;
+      break;
+
+  }
+}
 function checkMove() {
-  
+
+  if (moveForward)
+    table.translateX(1);
+
+  else if (moveBackwards)
+    table.translateX(-1);
+
+  else if (breakFB)
+    table.translateX(0);
+
 }
 function render() {
 	renderer.render(scene, camera1[active_camera]);
@@ -307,7 +333,7 @@ function render() {
 
 function animate() {
 	//Checks for keyboard input for movement
-	//checkMove();
+  checkMove();
 	//Renders Scene
 	render();
 
@@ -328,5 +354,6 @@ function init() {
     createCamera3();
 
     window.addEventListener("keydown", onKeyDown);
+    window.addEventListener("keyup", onKeyUp);
     window.addEventListener("resize", onResize);
 }
