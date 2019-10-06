@@ -279,12 +279,14 @@ function onKeyDown(e) {
 
     case 37://left arrow
         table.rotateY(-0.05);
+        arm.rotateY(-0.05);
         break;
     case 38://forward arrow
         moveForward = true;
         break;
     case 39://right arrow
         table.rotateY(0.05);
+        arm.rotateY(0.05);
         break;
     case 40://backwards arrow
         moveBackwards = true;
@@ -315,15 +317,20 @@ function onKeyUp(e) {
 }
 function checkMove() {
 
-  if (moveForward)
+  if (moveForward){
     table.translateX(1);
+    arm.translateX(1);
+  }
 
-  else if (moveBackwards)
+  else if (moveBackwards){
     table.translateX(-1);
+    arm.translateX(-1);
+  }
 
-  else if (breakFB)
+  else if (breakFB){
     table.translateX(0);
-
+    arm.translateX(0);
+  }
 }
 function render() {
 	renderer.render(scene, camera1[active_camera]);
