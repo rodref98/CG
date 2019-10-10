@@ -207,42 +207,43 @@ function createScene() {
     createFullRobot(0, 0, 0);
 
 }
-
-function createCamera() {
+//Camara frontal
+function createCamera3() {
     'use strict';
 
-    camera1[0] = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, 1000);
+    camera1[2] = new THREE.OrthographicCamera( -70, 70, 40, -40, 1, 1000 );
 
 
-    camera1[0].position.x =0;
-    camera1[0].position.y = 100;
-    camera1[0].position.z = 25;
-    camera1[0].lookAt(scene.position);
+    camera1[2].position.x = 0;
+    camera1[2].position.y = 0;
+    camera1[2].position.z = 0;
+    //camera1[2].rotation.x = 90;
+    camera1[2].lookAt(scene.position);
 }
-
+//Camara lateral 
 function createCamera2() {
     'use strict';
 
-    camera1[1] = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, 1000);
+    camera1[1] = new THREE.OrthographicCamera( -70, 70, 40, -40, 1, 1000 );
 
 
     camera1[1].position.x =0;
     camera1[1].position.y = 0;
-    camera1[1].position.z = 100;
+    camera1[1].position.z = 70;
     camera1[1].lookAt(scene.position);
 }
 
-//por camara frontal a funcionar com os valores certos (rotacao)
-function createCamera3() {
+//Camara com vista de topo
+function createCamera() {
     'use strict';
 
-    camera1[2] = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, 1000);
+    camera1[0] = new THREE.OrthographicCamera( -70, 70, 40, -40, 1, 1000 );
 
 
-    camera1[2].position.x =10;
-    camera1[2].position.y = 100;
-    camera1[2].position.z = 150;
-    camera1[2].lookAt(scene.position);
+    camera1[0].position.x =0;
+    camera1[0].position.y = 140;
+    camera1[0].position.z = 0;
+    camera1[0].lookAt(scene.position);
 }
 
 function switch_camera(number) {
@@ -274,11 +275,11 @@ function onKeyDown(e) {
         });
         break;
     case 50: //2
-        switch_camera(0);
+        switch_camera(1);
         break;
 
     case 49: //1
-        switch_camera(1);
+        switch_camera(0);
         break;
 
     case 51: //3
@@ -355,7 +356,7 @@ function render() {
 
 function animate() {
 	//Checks for keyboard input for movement
-  checkMove();
+    checkMove();
 	//Renders Scene
 	render();
 
@@ -374,6 +375,7 @@ function init() {
     createCamera();
     createCamera2();
     createCamera3();
+    switch_camera(0);
 
     window.addEventListener("keydown", onKeyDown);
     window.addEventListener("keyup", onKeyUp);
