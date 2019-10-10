@@ -204,7 +204,7 @@ function createScene() {
     createTable(-25, 0, 0);
     createTarget(55, 0, 0);
     createArm(-25,0,0);
-    createFullRobot(0, 0, 0)
+    createFullRobot(0, 0, 0);
 
 }
 
