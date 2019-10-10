@@ -1,4 +1,5 @@
 /*global THREE, requestAnimationFrame, console*/
+//Primeira entrega grupo 30
 
 
 
@@ -26,7 +27,7 @@ function addTableLeg(obj, x, y, z) {
 
 function addTableTop(obj, x, y, z) {
     'use strict';
-    geometry = new THREE.CubeGeometry(60, 2, 20);
+    geometry = new THREE.CubeGeometry(40, 2, 20);
     mesh = new THREE.Mesh(geometry, material);
     mesh.position.set(x, y, z);
     obj.add(mesh);
@@ -51,6 +52,7 @@ function addTargetTorus(obj, x, y, z){
     geometry = new THREE.TorusGeometry( 5, 1, 16, 50 );
     mesh = new THREE.Mesh( geometry, material );
     mesh.position.set(x, y, z);
+    mesh.rotation.y = Math.PI / 2;
     obj.add(mesh);
 
 
@@ -60,21 +62,20 @@ function addTargetTorus(obj, x, y, z){
 function addTableArtic1(obj, x, y, z){
 
     material = new THREE.MeshBasicMaterial( { color: 0xffff00, wireframe: true } );
-    geometry = new THREE.SphereBufferGeometry(5, 8, 6, 0, 2*Math.PI, 0, 0.5 * Math.PI);
+    geometry = new THREE.SphereBufferGeometry(3, 8, 6, 0, 2*Math.PI, 0, 0.5 * Math.PI);
     material.side = THREE.DoubleSide;
     mesh = new THREE.Mesh(geometry, material);
     mesh.position.set(x, y, z);
     obj.add(mesh);
 
 
-    //scene.add(artic);
 }
 
 
 function addArm1(obj,x,y,z){
     'use strict';
-    material = new THREE.MeshBasicMaterial({ color:0xffffff , wireframe: true });
-    geometry = new THREE.CubeGeometry(4, 22, 4);
+    material = new THREE.MeshBasicMaterial({ color:0x8CA38C , wireframe: true });
+    geometry = new THREE.CubeGeometry(2, 22, 2);
     mesh = new THREE.Mesh(geometry, material);
     mesh.position.set(x, y, z);
     obj.add(mesh);
@@ -82,8 +83,8 @@ function addArm1(obj,x,y,z){
 
 function addArm2(obj,x,y,z){
     'use strict';
-    material = new THREE.MeshBasicMaterial({ color:0xffffff , wireframe: true });
-    geometry = new THREE.CubeGeometry(22,4,4);
+    material = new THREE.MeshBasicMaterial({ color:0x8CA38C , wireframe: true });
+    geometry = new THREE.CubeGeometry(22,2,2);
     mesh = new THREE.Mesh(geometry, material);
     mesh.position.set(x, y, z);
     obj.add(mesh);
@@ -91,8 +92,8 @@ function addArm2(obj,x,y,z){
 
 function addHand(obj,x,y,z){
     'use strict';
-    material = new THREE.MeshBasicMaterial({ color:0xffffff , wireframe: true });
-    geometry = new THREE.CubeGeometry(4,12,4);
+    material = new THREE.MeshBasicMaterial({ color:0x8CA38C , wireframe: true });
+    geometry = new THREE.CubeGeometry(1,10,2);
     mesh = new THREE.Mesh(geometry, material);
     mesh.position.set(x, y, z);
     obj.add(mesh);
@@ -100,7 +101,7 @@ function addHand(obj,x,y,z){
 
 function addArmArtic(obj,x,y,z){
     material = new THREE.MeshBasicMaterial( { color: 0xffff00, wireframe: true } );
-    geometry = new THREE.SphereBufferGeometry(4, 8, 6, 0);
+    geometry = new THREE.SphereBufferGeometry(2, 8, 6, 0);
     material.side = THREE.DoubleSide;
     mesh = new THREE.Mesh(geometry, material);
     mesh.position.set(x, y, z);
@@ -110,7 +111,7 @@ function addArmArtic(obj,x,y,z){
 
 function addHandArtic(obj,x,y,z){
     material = new THREE.MeshBasicMaterial( { color: 0xffff00, wireframe: true } );
-    geometry = new THREE.SphereBufferGeometry(4, 8, 6, 0);
+    geometry = new THREE.SphereBufferGeometry(2, 8, 6, 0);
     material.side = THREE.DoubleSide;
     mesh = new THREE.Mesh(geometry, material);
     mesh.position.set(x, y, z);
@@ -119,26 +120,26 @@ function addHandArtic(obj,x,y,z){
 
 function addFinger(obj,x,y,z){
     'use strict';
-    material = new THREE.MeshBasicMaterial({ color:0xffffff , wireframe: true });
-    geometry = new THREE.CubeGeometry(10,2,2);
+    material = new THREE.MeshBasicMaterial({ color:0x8CA38C , wireframe: true });
+    geometry = new THREE.CubeGeometry(8,1,1);
     mesh = new THREE.Mesh(geometry, material);
     mesh.position.set(x, y, z);
     obj.add(mesh);
 }
 
 
-function createTable(x, y, z) {
+function createRobotBase(x, y, z) {
     'use strict';
 
     table = new THREE.Object3D();
 
-    material = new THREE.MeshBasicMaterial({ color: 0x00ff00, wireframe: true });
+    material = new THREE.MeshBasicMaterial({ color: 0x8CA38C, wireframe: true });
 
     addTableTop(table, 0, 0, 0);
-    addTableLeg(table, -25, 0, -8);
-    addTableLeg(table, -25, 0, 8);
-    addTableLeg(table, 25, 0, 8);
-    addTableLeg(table, 25, 0, -8);
+    addTableLeg(table, -15, 0, -8);
+    addTableLeg(table, -15, 0, 8);
+    addTableLeg(table, 15, 0, 8);
+    addTableLeg(table, 15, 0, -8);
     addTableArtic1(table, 0, 1, 0);
 
 
@@ -171,9 +172,9 @@ function createArm(x,y,z){
 
     addArm1(arm,0,12,0);
     addArm2(arm,12,24,0);
-    addHand(arm,29,24,0);
-    addFinger(arm,32,28,0);
-    addFinger(arm,32,20,0);
+    addHand(arm,26,24,0);
+    addFinger(arm,30,27,0);
+    addFinger(arm,30,21,0);
     addHandArtic(arm,24,24,0);
     addArmArtic(arm,0,24,0);
 
@@ -201,7 +202,7 @@ function createScene() {
     scene.add(new THREE.AxisHelper(100));
 
 
-    createTable(-25, 0, 0);
+    createRobotBase(-25, 0, 0);
     createTarget(55, 0, 0);
     createArm(-25,0,0);
     createFullRobot(0, 0, 0);
@@ -229,7 +230,7 @@ function createCamera2() {
 
     camera1[1].position.x =0;
     camera1[1].position.y = 0;
-    camera1[1].position.z = 70;
+    camera1[1].position.z = 100;
     camera1[1].lookAt(scene.position);
 }
 
