@@ -302,12 +302,11 @@ function onKeyDown(e) {
     case 65: //a
         arm.rotateY(0.05);
         break;
-    case 68: //d
-        arm.rotateY(-0.05);
-        break;
-    case 69:  //E
-    case 83: //s
+    case 81: //q
         arm.rotateZ(0.05);
+        break;
+    case 83: //s
+        arm.rotateY(-0.05);
         break;
     case 87: //w
         arm.rotateZ(-0.05);
