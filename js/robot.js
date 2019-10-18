@@ -204,7 +204,7 @@ function createScene() {
     createTable(-25, 0, 0);
     createTarget(55, 0, 0);
     createArm(-25,0,0);
-    createFullRobot(0, 0, 0)
+    createFullRobot(0, 0, 0);
 
 }
 
@@ -308,7 +308,9 @@ function onKeyDown(e) {
         arm.rotateZ(0.05);
         break;
     case 87: //w
-        arm.rotateZ(-0.05);
+      if (arm.rotation.z  > -70){
+         arm.rotation.z += -0.05;
+      }
         break;
     case 101: //e
         scene.traverse(function (node) {
