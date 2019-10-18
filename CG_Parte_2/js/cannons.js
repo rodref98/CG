@@ -12,6 +12,7 @@ var breakFB = false;
 var scene, renderer;
 
 var geometry, material, mesh;
+var left_cannon_mesh;
 
 var table, left_cannon, middle_cannon, right_cannon;
 var selected_cannon;
@@ -48,9 +49,6 @@ class Cannon extends Base_Object {
     createCannon(this, obj, x, y, z, rotY);
   }
 
-  toggleSelectedCannon(){
-    this.children[0].material.color.set(0xff0000);
-  }
   myType(){
     return "Cannon";
   }
@@ -170,7 +168,6 @@ function createScene() {
     left_cannon = createCannon(left_cannon, 55, 5, -5, -Math.PI/16);
     middle_cannon = createCannon(middle_cannon,55, 5, -30, 0);
     right_cannon = createCannon(right_cannon,55, 5, -55, Math.PI/16);
-    left_cannon.toggleSelectedCannon();
 
 
 
