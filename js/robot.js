@@ -220,7 +220,7 @@ function createCamera3() {
     camera1[2].position.z = 0;
     camera1[2].lookAt(scene.position);
 }
-//Camara lateral 
+//Camara lateral
 function createCamera2() {
     'use strict';
 
@@ -349,10 +349,10 @@ function checkMove() {
     fullrobot.translateX(0);
   }
 }
+
 function render() {
 	renderer.render(scene, camera1[active_camera]);
 }
-
 
 
 function animate() {
