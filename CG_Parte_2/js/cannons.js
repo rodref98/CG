@@ -12,7 +12,8 @@ var breakFB = false;
 var scene, renderer;
 
 var geometry, material, mesh;
-var left_cannon_mesh;
+var meshes = [];
+var merged_geo = new THREE.Geometry();
 
 var table, left_cannon, middle_cannon, right_cannon;
 var ball,ball1,ball2;
@@ -45,11 +46,38 @@ class Wall extends Base_Object {
 }
 
 class Cannon extends Base_Object {
-  constructor(x, y, z){
+  constructor(x, y, z, rotY){
     super();
-    createCannon(this, obj, x, y, z, rotY);
+    createCannon(this, x, y, z, rotY);
+    this.rotY = rotY;
   }
 
+  toggleSelectedCannon(){
+    if (this.rotY == 0){
+      meshes[2].material.color.set(0xff0000);
+      meshes[3].material.color.set(0xff0000);
+      meshes[0].material.color.set(0x1E90FF);
+      meshes[1].material.color.set(0x1E90FF);
+      meshes[4].material.color.set(0x1E90FF);
+      meshes[5].material.color.set(0x1E90FF);
+    }
+    else if (this.rotY == -Math.PI/16) {
+      meshes[0].material.color.set(0xff0000);
+      meshes[1].material.color.set(0xff0000);
+      meshes[2].material.color.set(0x1E90FF);
+      meshes[3].material.color.set(0x1E90FF);
+      meshes[4].material.color.set(0x1E90FF);
+      meshes[5].material.color.set(0x1E90FF);
+    }
+    else if (this.rotY == Math.PI/16) {
+      meshes[4].material.color.set(0xff0000);
+      meshes[5].material.color.set(0xff0000);
+      meshes[0].material.color.set(0x1E90FF);
+      meshes[1].material.color.set(0x1E90FF);
+      meshes[2].material.color.set(0x1E90FF);
+      meshes[3].material.color.set(0x1E90FF);
+    }
+  }
   myType(){
     return "Cannon";
   }
@@ -101,12 +129,14 @@ function addBackWall(obj, x, y, z) {
 function addCannonCylinder(obj, x, y, z) {
     'use strict';
 
-    geometry = new THREE.CylinderGeometry(4.5, 7, 20, 32, 0, true);
+    geometry = new THREE.CylinderGeometry(4.5, 4.5, 20, 32, 0, true);
     mesh = new THREE.Mesh(geometry, material);
 
     obj.add(mesh);
     mesh.position.set(x, y, z);
-
+    meshes.push(mesh);
+    //meshes[0].updateMatrix();
+    //merged_geo.merge(meshes[0].geometry, meshes[0].matrix);
     //obj.children.material.color.set(0xff0000);
     obj.add(mesh);
 }
@@ -114,10 +144,13 @@ function addCannonCylinder(obj, x, y, z) {
 function addCannonArtic(obj, x, y, z){
 
     material = new THREE.MeshBasicMaterial( { color: 0x1E90FF, wireframe: true } );
-    geometry = new THREE.SphereBufferGeometry(7, 8, 6, 0, 2*Math.PI, Math.PI/2, 0.5 * Math.PI);
+    geometry = new THREE.SphereBufferGeometry(4.5, 8, 6, 0, 2*Math.PI, Math.PI/2, 0.5 * Math.PI);
     material.side = THREE.DoubleSide;
     mesh = new THREE.Mesh(geometry, material);
     mesh.position.set(x, y, z);
+    meshes.push(mesh);
+    //mesh.updateMatrix();
+    //merged_geo.merge(geometry, mesh.matrix);
     obj.add(mesh);
 
 
@@ -152,11 +185,13 @@ function createCannon(index, x, y, z, rotY) {
 
     material = new THREE.MeshBasicMaterial({ color: 0x1E90FF, wireframe: true });
 
-
     //index.material.color.set(0xff0000);
     addCannonCylinder(index, 0, 10, 0);
     addCannonArtic(index, 0, 0, 0);
-
+    if (rotY == 0){
+      meshes[2].material.color.set(0xff0000);
+      meshes[3].material.color.set(0xff0000);
+    }
     scene.add(index);
 
     index.rotation.z = Math.PI/2;
@@ -288,20 +323,23 @@ function onKeyDown(e) {
     case 65: //a
     case 68: //d
     case 69:  //E
+          right_cannon.toggleSelectedCannon();
+          break;
     case 81: //Q
-          left_cannon.material.color.set(0xff0000);
-          selected_cannon = left_cannon;
+          left_cannon.toggleSelectedCannon();
           break;
     case 83: //s
     case 87: //w
-          left_cannon.material.color.set(0xff0000);
+          middle_cannon.toggleSelectedCannon();
+          break;
     case 101: //e
-        scene.traverse(function (node) {
+          scene.traverse(function (node) {
             if (node instanceof THREE.AxisHelper) {
-                node.visible = !node.visible;
+              node.visible = !node.visible;
             }
-        });
-        break;
+          });
+          break;
+
     }
 }
 
