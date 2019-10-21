@@ -86,7 +86,7 @@ class Cannon extends Base_Object {
 class Ball extends Base_Object {
   constructor(x, y, z){
     super();
-    createBall(this, x, y, z);
+    createBall(x, y, z);
   }
 
   myType(){
@@ -226,11 +226,11 @@ function createScene() {
 
 
     createWall(-25, 0, 0);
-    left_cannon = createCannon(left_cannon, 55, 5, -5, -Math.PI/16);
-    middle_cannon = createCannon(middle_cannon,55, 5, -30, 0);
-    right_cannon = createCannon(right_cannon,55, 5, -55, Math.PI/16);
-    ball1 = createBall(-20,0,-20);
-    ball2 = createBall(0,0,0);
+    left_cannon = new Cannon(55, 5, -5, -Math.PI/16);
+    middle_cannon = new Cannon(55, 5, -30, 0);
+    right_cannon = new Cannon(55, 5, -55, Math.PI/16);
+    ball1 = new Ball(75,0,-5);
+    ball2 = new Ball(75,0,20);
 
 
 }
