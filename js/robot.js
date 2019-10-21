@@ -216,8 +216,8 @@ function createCamera3() {
 
 
     camera1[2].position.x = 0;
-    camera1[2].position.y = 0;
-    camera1[2].position.z = 0;
+    camera1[2].position.y = 100;
+    camera1[2].position.z = 70;
     //camera1[2].rotation.x = 90;
     camera1[2].lookAt(scene.position);
 }
