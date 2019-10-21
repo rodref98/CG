@@ -49,6 +49,9 @@ class Cannon extends Base_Object {
     createCannon(this, obj, x, y, z, rotY);
   }
 
+  toggleSelectedCannon(){
+    this.children[0].material.color.set(0xff0000);
+  }
   myType(){
     return "Cannon";
   }
@@ -89,7 +92,7 @@ function addBackWall(obj, x, y, z) {
 function addCannonCylinder(obj, x, y, z) {
     'use strict';
 
-    geometry = new THREE.CylinderGeometry(4.5, 7, 20, 32, 0, true);
+    geometry = new THREE.CylinderGeometry(4.5, 4.5, 20, 32, 0, true);
     mesh = new THREE.Mesh(geometry, material);
 
     obj.add(mesh);
@@ -102,7 +105,7 @@ function addCannonCylinder(obj, x, y, z) {
 function addCannonArtic(obj, x, y, z){
 
     material = new THREE.MeshBasicMaterial( { color: 0x1E90FF, wireframe: true } );
-    geometry = new THREE.SphereBufferGeometry(7, 8, 6, 0, 2*Math.PI, Math.PI/2, 0.5 * Math.PI);
+    geometry = new THREE.SphereBufferGeometry(4.5, 8, 6, 0, 2*Math.PI, Math.PI/2, 0.5 * Math.PI);
     material.side = THREE.DoubleSide;
     mesh = new THREE.Mesh(geometry, material);
     mesh.position.set(x, y, z);
@@ -168,6 +171,7 @@ function createScene() {
     left_cannon = createCannon(left_cannon, 55, 5, -5, -Math.PI/16);
     middle_cannon = createCannon(middle_cannon,55, 5, -30, 0);
     right_cannon = createCannon(right_cannon,55, 5, -55, Math.PI/16);
+  //  left_cannon.toggleSelectedCannon();
 
 
 
