@@ -133,7 +133,7 @@ function createRobotBase(x, y, z) {
 
     table = new THREE.Object3D();
 
-    material = new THREE.MeshBasicMaterial({ color: 0x8CA38C, wireframe: true });
+    material = new THREE.MeshBasicMaterial({ color: 0xFFFFFF, wireframe: true });
 
     addTableTop(table, 0, 0, 0);
     addTableLeg(table, -15, 0, -8);
@@ -215,13 +215,12 @@ function createCamera3() {
     camera1[2] = new THREE.OrthographicCamera( -70, 70, 40, -40, 1, 1000 );
 
 
-    camera1[2].position.x = 0;
-    camera1[2].position.y = 100;
-    camera1[2].position.z = 70;
-    //camera1[2].rotation.x = 90;
+    camera1[2].position.x = -2.5;
+    camera1[2].position.y = 0;
+    camera1[2].position.z = 0;
     camera1[2].lookAt(scene.position);
 }
-//Camara lateral 
+//Camara lateral
 function createCamera2() {
     'use strict';
 
@@ -309,7 +308,9 @@ function onKeyDown(e) {
         arm.rotateY(-0.05);
         break;
     case 87: //w
-        arm.rotateZ(-0.05);
+      if (arm.rotation.z  > -70){
+         arm.rotation.z += -0.05;
+      }
         break;
     case 101: //e
         scene.traverse(function (node) {
@@ -348,10 +349,10 @@ function checkMove() {
     fullrobot.translateX(0);
   }
 }
+
 function render() {
 	renderer.render(scene, camera1[active_camera]);
 }
-
 
 
 function animate() {
