@@ -60,6 +60,7 @@ class Cannon extends Base_Object {
       meshes[1].material.color.set(0x1E90FF);
       meshes[4].material.color.set(0x1E90FF);
       meshes[5].material.color.set(0x1E90FF);
+      selected_cannon = middle_cannon;
     }
     else if (this.rotY == -Math.PI/16) {
       meshes[0].material.color.set(0xff0000);
@@ -68,6 +69,7 @@ class Cannon extends Base_Object {
       meshes[3].material.color.set(0x1E90FF);
       meshes[4].material.color.set(0x1E90FF);
       meshes[5].material.color.set(0x1E90FF);
+      selected_cannon = left_cannon;
     }
     else if (this.rotY == Math.PI/16) {
       meshes[4].material.color.set(0xff0000);
@@ -76,8 +78,17 @@ class Cannon extends Base_Object {
       meshes[1].material.color.set(0x1E90FF);
       meshes[2].material.color.set(0x1E90FF);
       meshes[3].material.color.set(0x1E90FF);
+      selected_cannon = right_cannon;
     }
   }
+
+  toggleLeftMovement(){
+    selected_cannon.rotateX(0.05);
+  }
+  toggleRightMovement(){
+    selected_cannon.rotateX(-0.05);
+  }
+
   myType(){
     return "Cannon";
   }
@@ -181,8 +192,6 @@ function createWall(x, y, z) {
 function createCannon(index, x, y, z, rotY) {
     'use strict';
 
-    index = new THREE.Object3D();
-
     material = new THREE.MeshBasicMaterial({ color: 0x1E90FF, wireframe: true });
 
     //index.material.color.set(0xff0000);
@@ -208,7 +217,7 @@ function createBall(x, y, z) {
 
   material = new THREE.MeshBasicMaterial({ color: 0x00ff00, wireframe: true });
   addBall(ball,-20,5,-25);
-  
+
 
   ball.position.x = x;
   ball.position.y = y;
@@ -229,9 +238,12 @@ function createScene() {
     left_cannon = new Cannon(55, 5, -5, -Math.PI/16);
     middle_cannon = new Cannon(55, 5, -30, 0);
     right_cannon = new Cannon(55, 5, -55, Math.PI/16);
+    selected_cannon = middle_cannon;
+    ball = new Ball(75,0,-30);
     ball1 = new Ball(75,0,-5);
     ball2 = new Ball(75,0,20);
     ball3 = new Ball(75,0,-30);
+
 
 }
 
@@ -313,10 +325,14 @@ function onKeyDown(e) {
         break;
 
     case 37://left arrow
+        selected_cannon.toggleLeftMovement();
+        break
     case 38://forward arrow
         moveForward = true;
         break;
     case 39://right arrow
+        selected_cannon.toggleRightMovement();
+        break
     case 40://backwards arrow
         moveBackwards = true;
         break;
