@@ -16,7 +16,7 @@ var meshes = [];
 var merged_geo = new THREE.Geometry();
 
 var table, left_cannon, middle_cannon, right_cannon;
-var ball,ball1,ball2;
+var ball,ball1,ball2,ball3;
 var selected_cannon;
 
 class Base_Object extends THREE.Object3D{
@@ -231,7 +231,7 @@ function createScene() {
     right_cannon = new Cannon(55, 5, -55, Math.PI/16);
     ball1 = new Ball(75,0,-5);
     ball2 = new Ball(75,0,20);
-
+    ball3 = new Ball(75,0,-30);
 
 }
 
