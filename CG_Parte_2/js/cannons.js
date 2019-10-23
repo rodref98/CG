@@ -16,13 +16,21 @@ var meshes = [];
 var merged_geo = new THREE.Geometry();
 
 var table, left_cannon, middle_cannon, right_cannon;
-var ball,ball1,ball2;
+var ball,ball1,ball2, ball3;
 var selected_cannon;
+var temp = new THREE.Vector3;
 
 class Base_Object extends THREE.Object3D{
   constructor(){
     super();
-  }
+		this.velocity = new THREE.Vector3();
+		this.aceleration = new THREE.Vector3();
+		this.maxvel = new THREE.Vector3();
+		this.minvel = new THREE.Vector3();
+		this.width = 0;
+		this.height = 0;
+		this.radius = 0;
+	}
 
   toggleWireframe(wire) {
     this.children[0].material.wireframe = wire;
@@ -31,6 +39,7 @@ class Base_Object extends THREE.Object3D{
   myType(){
     return "Object";
   }
+  
 
 }
 
@@ -242,7 +251,7 @@ function createScene() {
     ball = new Ball(75,0,-30);
     ball1 = new Ball(75,0,-5);
     ball2 = new Ball(75,0,20);
-
+    ball3 = new Ball(-5, 0, -5);
 
 
 }
@@ -251,23 +260,23 @@ function createScene() {
 function createCamera3() {
     'use strict';
 
-    camera1[2] = new THREE.OrthographicCamera( -70, 70, 40, -40, 1, 1000 );
+    camera1[2] = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, 100); 
 
-
-    camera1[2].position.x = -2.5;
-    camera1[2].position.y = 0;
-    camera1[2].position.z = 0;
-    camera1[2].lookAt(scene.position);
+    camera1[2].position.x = -5;
+    camera1[2].position.y = 10;
+    camera1[2].position.z = -5;
+    middle_cannon.add(camera1[2]);
+    camera1[2].lookAt( new THREE.Vector3(0, 0, 0) );
 }
 //Camara lateral
 function createCamera2() {
     'use strict';
 
-    camera1[1] = new THREE.OrthographicCamera( -70, 70, 40, -40, 1, 1000 );
+    camera1[1] = new THREE.PerspectiveCamera( 45, 1920/1080, 1, 1000);
 
 
     camera1[1].position.x =0;
-    camera1[1].position.y = 0;
+    camera1[1].position.y = 40;
     camera1[1].position.z = 100;
     camera1[1].lookAt(scene.position);
 }
@@ -337,6 +346,8 @@ function onKeyDown(e) {
         moveBackwards = true;
         break;
     case 65: //a
+      ball3.translateZ(0.01);
+      break;
     case 68: //d
     case 69:  //E
           right_cannon.toggleSelectedCannon();
@@ -381,9 +392,8 @@ function render() {
 
 function animate() {
 	//Renders Scene
-	render();
-
-	requestAnimationFrame(animate);
+    requestAnimationFrame(animate);
+    render();
 }
 
 function init() {
