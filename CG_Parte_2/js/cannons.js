@@ -104,13 +104,13 @@ class Cannon extends Base_Object {
     super();
     createCannon(this, x, y, z, rotY);
     this.rotY = rotY;
-    if (rotY == 0){
+    if (this.rotY == 0){
       this.ball_position = [55, 5, -30];
     }
-    else if (rotY == Math.PI/16){
+    else if (this.rotY == Math.PI/16){
       this.ball_position = [55, 5, -55];
     }
-    else if (rotY == -Math.PI/16) {
+    else if (this.rotY == -Math.PI/16) {
       this.ball_position = [55, 5, -5];
     }
   }
@@ -164,9 +164,9 @@ class Cannon extends Base_Object {
 class Ball extends Base_Object {
   constructor(x, y, z){
     super();
+    createBall(this, x, y, z);
     this.velocity = new THREE.Vector3();
     this.velocity.set(1, 0,	 0);
-    createBall(this, x, y, z);
   }
 
   update_position(ticks){
@@ -517,23 +517,11 @@ function onKeyUp(e) {
 }
 
 
-/*function checkMove() {
-	var delta = clock.getDelta();
+function checkMove() {
+	var ticks = clock.getDelta();
 
-	//Cannon.updatepos(delta);	//Cannon movement
-
-	var i = 0;
-	var l = objectsgroup.children.length;
-
-	while (i < l) {
-		objectsgroup.children[i].updatepos(delta); //aliens and bullet movement
-		i = i + 1;
-		l = objectsgroup.children.length;
-	}
-
-	//Checks for collisions of certain objects
-	handleCollisions();
-}*/
+  selected_cannon.ball.update_position(ticks);
+}
 
 function render() {
 	renderer.render(scene, camera1[active_camera]);
