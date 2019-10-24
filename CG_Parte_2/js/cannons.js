@@ -143,10 +143,10 @@ class Cannon extends Base_Object {
   }
 
   toggleLeftMovement(){
-    selected_cannon.rotateX(0.05);
+    selected_cannon.rotateZ(0.05);
   }
   toggleRightMovement(){
-    selected_cannon.rotateX(-0.05);
+    selected_cannon.rotateZ(-0.05);
   }
   shootBall(){
     this.ball = new Ball(this.ball_position[0], this.ball_position[1], this.ball_position[2]);
