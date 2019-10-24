@@ -101,6 +101,8 @@ class Cannon extends Base_Object {
     super();
     createCannon(this, x, y, z, rotY);
     this.rotY = rotY;
+    this.velocitysetX = -0.5;
+    this.velocitysetZ = 0;
     if (this.rotY == 0){
       this.ball_position = [32, 4, 0];
     }
@@ -143,15 +145,21 @@ class Cannon extends Base_Object {
   }
 
   toggleLeftMovement(){
-    selected_cannon.rotateZ(0.05);
+    selected_cannon.rotateX(0.05);
+    this.velocitysetX -= 0.03;
+    this.velocitysetZ += 0.03;
+    this.ball_position[2] -= -1;
   }
   toggleRightMovement(){
-    selected_cannon.rotateZ(-0.05);
+    selected_cannon.rotateX(-0.05);
+    this.velocitysetX += 0.03;
+    this.velocitysetZ -= 0.03;
+    this.ball_position[2] += -1;
   }
   shootBall(){
     this.ball = new Ball(this.ball_position[0], this.ball_position[1], this.ball_position[2]);
     this.ball.position.set(this.ball_position[0], this.ball_position[1], this.ball_position[2]);
-    this.ball.velocity.set(-0.5, 0, 0);
+    this.ball.velocity.set(this.velocitysetX, 0, this.velocitysetZ);
   }
 
   myType(){
@@ -437,8 +445,8 @@ function createScene() {
     new Ball(20,4,0);
     new Ball(-15, 4, 15);
     ball_camera = new Ball(15, 4, 15);
-    create_matrixR(Math.PI/16);
-    rotate();
+    //create_matrixR(Math.PI/16);
+    //rotate();
     scene.add(grupo);
 
 }
