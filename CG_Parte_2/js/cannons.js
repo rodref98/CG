@@ -30,6 +30,15 @@ var last_height;
 
 var new_bulet_allowed = true;
 
+var ratio = 2.07;
+var scale = 0.013
+var scale_width;
+var scale_height;
+var last_width;
+var last_height;
+
+var new_bulet_allowed = true;
+
 class Base_Object extends THREE.Object3D{
   constructor(){
     super();
@@ -49,6 +58,7 @@ class Base_Object extends THREE.Object3D{
   myType(){
     return "Object";
   }
+
 
 
 }
