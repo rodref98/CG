@@ -131,7 +131,7 @@ function createBall(x, y, z) {
   material = new THREE.MeshBasicMaterial({ color: 0x00ff00, wireframe: wires });
   geometry = new THREE.SphereGeometry(4, 16 ,12);
   mesh = new THREE.Mesh(geometry, material);
-  mesh.position.set(-20,5,-25);
+  mesh.position.set(x, y, z);
   ball.add(mesh);
   //addBall(ball,-20,5,-25);
 
@@ -263,7 +263,7 @@ function createScene() {
     middle_cannon = new Cannon(55, 5, -30, 0);
     right_cannon = new Cannon(55, 5, -55, Math.PI/16);
     selected_cannon = middle_cannon;
-    ball = new Ball(75,0,-30);
+    ball = new Ball(27,0,0);
     ball1 = new Ball(75,0,-5);
     ball2 = new Ball(75,0,20);
     ball3 = new Ball(-5, 0, -5);
