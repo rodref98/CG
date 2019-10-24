@@ -107,13 +107,13 @@ class Cannon extends Base_Object {
     createCannon(this, x, y, z, rotY);
     this.rotY = rotY;
     if (this.rotY == 0){
-      this.ball_position = [55, 5, -30];
+      this.ball_position = [55, 4, -30];
     }
     else if (this.rotY == Math.PI/16){
-      this.ball_position = [55, 5, -55];
+      this.ball_position = [55, 4, -55];
     }
     else if (this.rotY == -Math.PI/16) {
-      this.ball_position = [55, 5, -5];
+      this.ball_position = [55, 4, -5];
     }
   }
 
@@ -286,7 +286,7 @@ function createWall(table, x, y, z) {
 
 function addGroundWall(obj, x, y, z) {
   'use strict';
-  geometry = new THREE.CubeGeometry(60, 2, 62);
+  geometry = new THREE.CubeGeometry(60, 0, 62);
   mesh = new THREE.Mesh(geometry, material);
   mesh.position.set(x, y, z);
   obj.add(mesh);
@@ -417,11 +417,11 @@ function createScene() {
     middle_cannon = new Cannon(55, 1, 0, 0);
     right_cannon = new Cannon(55, 1, -25, Math.PI/16);
     selected_cannon = middle_cannon;
-    new Ball(-10,0,0);
-    new Ball(27,0,-5);
-    new Ball(27,0,20);
-    new Ball(-5, 0, -5);
-    ball_camera = new Ball(-7, 0, -7);
+    new Ball(-10,4,0);
+    new Ball(27,4,-5);
+    new Ball(27,4,20);
+    new Ball(-5, 4, -5);
+    ball_camera = new Ball(-7, 4, -7);
     scene.add(grupo);
 
 }
