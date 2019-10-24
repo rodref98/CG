@@ -12,7 +12,7 @@ var contador = 0;
 var geometry, material, mesh;
 var meshes = [];
 
-var table, left_cannon, middle_cannon, right_cannon;
+var table, left_cannon, middle_cannon, right_cannon, ball_camera;
 var selected_cannon;
 var matrix_rotate;
 
@@ -421,6 +421,7 @@ function createScene() {
     new Ball(27,0,-5);
     new Ball(27,0,20);
     new Ball(-5, 0, -5);
+    ball_camera = new Ball(-7, 0, -7);
     scene.add(grupo);
 
 }
@@ -431,10 +432,8 @@ function createCamera3() {
 
     camera1[2] = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, 100);
 
-    camera1[2].position.x = -5;
-    camera1[2].position.y = 10;
-    camera1[2].position.z = -5;
-    middle_cannon.add(camera1[2]);
+    ball_camera.add(camera1[2]);
+    camera1[2].position.set(0, 10, 10);
     camera1[2].lookAt( new THREE.Vector3(0, 0, 0) );
 }
 //Camara lateral
