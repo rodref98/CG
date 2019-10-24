@@ -264,11 +264,11 @@ function createWall(table, x, y, z) {
 
 
     material = new THREE.MeshBasicMaterial({ color: 0x7FFFD4, wireframe: wires });
-    addGroundWall(table, 0, -1, -30);
+    addGroundWall(table, 0, 0, 0);
     //material = new THREE.MeshBasicMaterial({ color: 0x00ff00, wireframe: wires });
-    addSideWall(table, 0, 5, 0);
-    addSideWall(table, 0, 5, -60);
-    addBackWall(table, -29, 5, -30);
+    addSideWall(table, 0, 5, -30);
+    addSideWall(table, 0, 5, 30);
+    addBackWall(table, -29, 5, 0);
 
     material = new THREE.MeshBasicMaterial({ color: 0xffe4b5, wireframe: wires });
     material.transparent = true;
@@ -412,10 +412,10 @@ function createScene() {
     scene.add(new THREE.AxisHelper(100));
 
 
-    new Wall(-25,0,0);
-    left_cannon = new Cannon(55, 5, -5, -Math.PI/16);
-    middle_cannon = new Cannon(55, 5, -30, 0);
-    right_cannon = new Cannon(55, 5, -55, Math.PI/16);
+    new Wall(0,0,0);
+    left_cannon = new Cannon(55, 1, 25, -Math.PI/16);
+    middle_cannon = new Cannon(55, 1, 0, 0);
+    right_cannon = new Cannon(55, 1, -25, Math.PI/16);
     selected_cannon = middle_cannon;
     new Ball(-10,0,0);
     new Ball(27,0,-5);
