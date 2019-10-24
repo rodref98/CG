@@ -358,15 +358,28 @@ function addCannonArtic(obj, x, y, z){
 function create_matrixR(x) {
   matrix_rotate = new Float32Array(16);
 
-  matrix_rotate[0] = Math.cos(x);
-  matrix_rotate[1] = -Math.sin(x);
+  matrix_rotate[0] = 1;
+  matrix_rotate[1] = 0;
   matrix_rotate[2] = 0;
-  matrix_rotate[4] = Math.sin(x);
+  matrix_rotate[3] = 0;
+
+  matrix_rotate[4] = 0;
   matrix_rotate[5] = Math.cos(x);
-  matrix_rotate[6] = 0;
+  matrix_rotate[6] = -Math.sin(x);
+  matrix_rotate[7] = 0;
+
   matrix_rotate[8] = 0;
-  matrix_rotate[9] = 0;
-  matrix_rotate[10] = 1;
+  matrix_rotate[9] = Math.sin(x);
+  matrix_rotate[10] = Math.cos(x);
+  matrix_rotate[11] = 0;
+
+  matrix_rotate[12] = 0;
+  matrix_rotate[13] = 0;
+  matrix_rotate[14] = 0;
+  matrix_rotate[15] = 1;
+
+
+
 
 
 }
@@ -375,6 +388,7 @@ function rotate() {
   var resultb = new Float32Array(16);
   var resultMatrix = new THREE.Matrix4();
   var resultMatrixb = new THREE.Matrix4();
+  var q1 = new THREE.Quaternion();
   var v1 = new THREE.Vector3(0, 1, 0);
 
 
@@ -401,7 +415,10 @@ function rotate() {
                   result[4], result[5], result[6], result[7],
                   result[8], result[9], result[10], result[11],
                   result[12], result[13], result[14], result[15]);*/
-  console.log(middle_cannon.matrix)
+  q1.setFromAxisAngle(v1, Math.PI/2);
+  middle_cannon.quaternion.multiply(q1);
+  selected_cannon.matrix.multiply(resultMatrix);
+  console.log(selected_cannon.matrix)
   //middle_cannon.matrix.rotateByAxis(v1, Math.PI/16);
   meshes[1].matrix = resultMatrixb;
   //console.log(meshes[0].matrix);
@@ -427,6 +444,8 @@ function createScene() {
     new Ball(20,4,0);
     new Ball(-15, 4, 15);
     ball_camera = new Ball(15, 4, 15);
+    create_matrixR(Math.PI/16);
+    rotate();
     scene.add(grupo);
 
 }
