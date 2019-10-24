@@ -11,7 +11,7 @@ var grupo = new THREE.Group();
 var contador = 0;
 var geometry, material, mesh;
 var meshes = [];
-
+var Axis = true;
 var table, left_cannon, middle_cannon, right_cannon, ball_camera;
 var selected_cannon;
 var matrix_rotate;
@@ -106,6 +106,7 @@ class Cannon extends Base_Object {
     super();
     createCannon(this, x, y, z, rotY);
     this.rotY = rotY;
+    this.add(new THREE.AxisHelper(7));
     if (this.rotY == 0){
       this.ball_position = [32, 4, 0];
     }
@@ -170,10 +171,11 @@ class Ball extends Base_Object {
     this.width = 8;
 		this.height = 8;
 		this.radius = 4;
-    this.velocity.set( (2 * Math.random() ) - 1 , 0  , (2 * Math.random() )).normalize().multiplyScalar(0.5);
+    this.velocity.set( (2 * Math.random() ) - 1 , 0  , (2 * Math.random() )-1).normalize().multiplyScalar(0.5);
     //this.aceleration.set(0, 0, 0);
     this.maxvel.set(1,1,1);
     this.minvel.set(-1,-1,-1);
+    this.add(new THREE.AxisHelper(7));
     createBall(this, x, y, z);
   }
 
@@ -195,7 +197,7 @@ class Ball extends Base_Object {
 		if(obj.myType() == "Ball"){
       var aux = this.velocity;
       this.velocity = obj.velocity;
-      this.maxvel.set(0.2,0, 0.2);
+      this.maxvel.set(0.02,0, 0.02);
 			obj.velocity= aux;
 		}
 		//Alien-Bullet collision should make both Bullet and Alien dissapear
@@ -413,8 +415,8 @@ function createScene() {
     selected_cannon = middle_cannon;
     new Ball(-20,4,0);
     new Ball(20,4,0);
-    new Ball(-15, 4, 5);
-    ball_camera = new Ball(15, 4, 5);
+    new Ball(-15, 4, 15);
+    ball_camera = new Ball(15, 4, 15);
     scene.add(grupo);
 
 }
@@ -510,7 +512,12 @@ function onKeyDown(e) {
     case 81: //Q
           left_cannon.toggleSelectedCannon();
           break;
-    case 83: //s
+    case 82: //r
+        if(Axis){
+          for(var i = 4; i < grupo.children.length; i++){
+            grupo.children[i].children.remove(AxisHelper);
+          }
+        }
     case 87: //w
           middle_cannon.toggleSelectedCannon();
           break;
