@@ -19,6 +19,17 @@ var meshes = [];
 
 var table, left_cannon, middle_cannon, right_cannon;
 var selected_cannon;
+var matrix_rotate;
+
+var ratio = 2.07;
+var scale = 0.013
+var scale_width;
+var scale_height;
+var last_width;
+var last_height;
+
+var clock = new THREE.Clock();
+var new_bulet_allowed = true;
 
 var ratio = 2.07;
 var scale = 0.013
@@ -72,7 +83,8 @@ class Base_Object extends THREE.Object3D{
   myType(){
     return "Object";
   }
-  
+
+
 
 }
 
@@ -92,6 +104,15 @@ class Cannon extends Base_Object {
     super();
     createCannon(this, x, y, z, rotY);
     this.rotY = rotY;
+    if (rotY == 0){
+      this.ball_position = [75, 0, -5];
+    }
+    else if (rotY == Math.PI/16){
+      this.ball_position = [75, 0, -30];
+    }
+    else if (rotY == -Math.PI/16) {
+      this.ball_position = [75, 0, 20];
+    }
   }
 
   toggleSelectedCannon(){
@@ -130,6 +151,10 @@ class Cannon extends Base_Object {
   toggleRightMovement(){
     selected_cannon.rotateX(-0.05);
   }
+  shootBall(){
+    this.ball = new Ball(this.ball_position[0], this.ball_position[1], this.ball_position[2]);
+    this.ball.position.set(this.ball_position[0], this.ball_position[1], this.ball_position[2]);
+  }
 
   myType(){
     return "Cannon";
@@ -139,9 +164,22 @@ class Cannon extends Base_Object {
 class Ball extends Base_Object {
   constructor(x, y, z){
     super();
+    this.velocity = new THREE.Vector3();
+    this.velocity.set(1, 0,	 0);
     createBall(this, x, y, z);
   }
 
+  update_position(ticks){
+    //var oldvelocity = new THREE.Vector3().copy(this.velocity);
+		var oldposition = new THREE.Vector3().copy(this.position);
+
+    //var newvelocity = (oldvelocity.addScaledVector(this.aceleration, delta));
+
+    var newposition = oldposition.add(this.velocity);
+
+    this.position.copy(newposition);
+
+  }
   myType(){
     return "Ball";
   }
@@ -280,6 +318,51 @@ function addCannonArtic(obj, x, y, z){
 
 
 
+function create_matrixR(x) {
+  matrix_rotate = new Float32Array(16);
+
+  matrix_rotate[0] = Math.cos(x);
+  matrix_rotate[1] = -Math.sin(x);
+  matrix_rotate[2] = 0;
+  matrix_rotate[4] = Math.sin(x);
+  matrix_rotate[5] = Math.cos(x);
+  matrix_rotate[6] = 0;
+  matrix_rotate[8] = 0;
+  matrix_rotate[9] = 0;
+  matrix_rotate[10] = 1;
+
+
+}
+function rotate() {
+  var result = new Float32Array(16);
+  var resultb = new Float32Array(16);
+  var resultMatrix = new THREE.Matrix4();
+  for (var i = 0; i < 3; i++) {
+    for (var j = 0; j < 3; j++) {
+      var sum = 0;
+      var sumb = 0;
+      for (var k = 0; k < 3; k++) {
+        if (undefined != meshes[0].matrix.elements){
+        sum += meshes[0].matrix.elements[4*i+k] * matrix_rotate[4*k+j];
+        sumb += meshes[1].matrix.elements[4*i+k] * matrix_rotate[4*k+j];
+        }
+      }
+      result[4*i+j] = sum;
+      resultb[4*i+j] = sumb;
+    }
+  }
+  resultMatrix.fromArray(result);
+  console.log(resultMatrix);
+  meshes[0].matrix = resultMatrix;
+
+  meshes[1].matrix.elements = resultb;
+  console.log(meshes[0].matrix.elements);
+
+}
+ function checkMove(){
+   var ticks = clock.getDelta();
+   selected_cannon.ball.update_position(ticks);
+ }
 
 function createScene() {
     'use strict';
@@ -298,7 +381,6 @@ function createScene() {
     new Ball(27,0,-5);
     new Ball(27,0,20);
     new Ball(-5, 0, -5);
-    console.log(grupo.children);
     scene.add(grupo);
 
 }
@@ -307,7 +389,7 @@ function createScene() {
 function createCamera3() {
     'use strict';
 
-    camera1[2] = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, 100); 
+    camera1[2] = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, 100);
 
     camera1[2].position.x = -5;
     camera1[2].position.y = 10;
@@ -361,7 +443,9 @@ function onKeyDown(e) {
     'use strict';
 
     switch (e.keyCode) {
-      
+      case 32: //Space
+        selected_cannon.shootBall();
+        break;
       case 52: //4
         wires = !wires;
         //console.log(grupo.lenght);
