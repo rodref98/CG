@@ -561,14 +561,6 @@ function onKeyDown(e) {
     case 87: //w
           middle_cannon.toggleSelectedCannon();
           break;
-    case 68: //d
-          scene.traverse(function (node) {
-            if (node instanceof THREE.AxisHelper) {
-              node.visible = !node.visible;
-            }
-          });
-          break;
-
     }
 }
 
