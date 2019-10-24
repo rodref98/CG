@@ -414,7 +414,7 @@ function rotate() {
                   result[8], result[9], result[10], result[11],
                   result[12], result[13], result[14], result[15]);*/
   console.log(middle_cannon.matrix)
-  middle_cannon.matrix.rotateByAxis(v1, Math.PI/16);
+  //middle_cannon.matrix.rotateByAxis(v1, Math.PI/16);
   meshes[1].matrix = resultMatrixb;
   //console.log(meshes[0].matrix);
   //console.log(meshes[0].matrix.elements);
@@ -571,7 +571,7 @@ function checkMove() {
   //console.log(grupo.children);
   //console.log(grupo.children);
 	while (i < l) {
-    
+
 		grupo.children[i].updatepos(delta); //Balls movement
 		i = i + 1;
 		l = grupo.children.length;
