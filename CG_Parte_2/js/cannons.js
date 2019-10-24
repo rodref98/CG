@@ -11,7 +11,9 @@ var grupo = new THREE.Group();
 var contador = 0;
 var geometry, material, mesh;
 var meshes = [];
-var Axis = true;
+var Axiscont = 0;
+var Axisvec = [];
+var Axistf = true;
 var table, left_cannon, middle_cannon, right_cannon, ball_camera;
 var selected_cannon;
 var matrix_rotate;
@@ -174,7 +176,10 @@ class Ball extends Base_Object {
     //this.aceleration.set(0, 0, 0);
     this.maxvel.set(1,1,1);
     this.minvel.set(-1,-1,-1);
-    this.add(new THREE.AxisHelper(7));
+    this.index = Axiscont;
+    Axisvec[this.index] = new THREE.AxisHelper(7);
+    Axiscont ++;
+    this.add(Axisvec[this.index]); 
     createBall(this, x, y, z);
   }
 
@@ -189,19 +194,25 @@ class Ball extends Base_Object {
 		npos.setZ( (height/2 - this.height/2) * side);
 		nvel.setZ(nvel.z * -1);
 		return npos, nvel;
-	}
+  }
+  toggleoffAxisHelper(){
+    this.remove(Axisvec[this.index]);
+  }
+  toggleonAxisHelper(){
+    this.add(Axisvec[this.index]);
+  }
 
 	treatCollision(obj){
-		//Alien-Alien collision should make them go the opposite direction
+		//Ball-Ball collision should make them go the opposite direction
 		if(obj.myType() == "Ball"){
       var aux = this.velocity;
       this.velocity = obj.velocity;
       this.maxvel.set(0.02,0, 0.02);
 			obj.velocity= aux;
 		}
-		//Alien-Bullet collision should make both Bullet and Alien dissapear
+		//Ball-FinalWall collision should make both Bullet and Alien dissapear
 		if(obj.myType() == "Wall" && obj.mesh.material.color == 0xFF0000){
-      console.log("kapap");
+      //console.log("kapap");
 			objectsgroup.remove(this);
 		}
   }
@@ -211,18 +222,6 @@ class Ball extends Base_Object {
 
 }
 
-
- /* update_position(ticks){
-    //var oldvelocity = new THREE.Vector3().copy(this.velocity);
-		var oldposition = new THREE.Vector3().copy(this.position);
-
-    //var newvelocity = (oldvelocity.addScaledVector(this.aceleration, delta));
-
-    var newposition = oldposition.add(this.velocity);
-
-    this.position.copy(newposition);
-
-  }*/
 
 
   /*Iterates through objectsgroup in search for collisions*/
@@ -237,11 +236,11 @@ function handleCollisions() {
 function createBall(obj, x, y, z) {
   'use strict';
 
-
   var kmaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00, wireframe: wires });
   var kgeometry = new THREE.SphereGeometry(3.8, 16 ,12);
   var kmesh = new THREE.Mesh(kgeometry, kmaterial);
 
+  //obj.add(new THREE.AxisHelper(7));
   obj.add(kmesh);
 
 
@@ -512,7 +511,21 @@ function onKeyDown(e) {
           left_cannon.toggleSelectedCannon();
           break;
     case 82: //r
-
+        if(Axistf){
+          for(var i = 4; i < grupo.children.length; i++){
+            //console.log(grupo.children[i]);
+            grupo.children[i].toggleoffAxisHelper();
+          }
+          Axistf = false;
+        }
+        else{
+          for(var i = 4; i < grupo.children.length; i++){
+            //console.log(grupo.children[i]);
+            grupo.children[i].toggleonAxisHelper();
+          }
+          Axistf = true;
+        }
+        break;
     case 87: //w
           middle_cannon.toggleSelectedCannon();
           break;
