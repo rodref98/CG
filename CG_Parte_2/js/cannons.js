@@ -105,13 +105,13 @@ class Cannon extends Base_Object {
     createCannon(this, x, y, z, rotY);
     this.rotY = rotY;
     if (rotY == 0){
-      this.ball_position = [75, 0, -5];
+      this.ball_position = [55, 5, -30];
     }
     else if (rotY == Math.PI/16){
-      this.ball_position = [75, 0, -30];
+      this.ball_position = [55, 5, -55];
     }
     else if (rotY == -Math.PI/16) {
-      this.ball_position = [75, 0, 20];
+      this.ball_position = [55, 5, -5];
     }
   }
 
@@ -226,7 +226,7 @@ function createWall(x, y, z) {
     addSideWall(table, 0, 5, 0);
     addSideWall(table, 0, 5, -60);
     addBackWall(table, -29, 5, -30);
-    
+
     material = new THREE.MeshBasicMaterial({ color: 0xffe4b5, wireframe: wires });
     material.transparent = true;
     material.opacity =  0.5*Math.sin(new Date().getTime() * .0025);
@@ -277,7 +277,7 @@ function createCannon(index, x, y, z, rotY) {
     meshes[3].material.color.set(0xff0000);
   }
   contador = contador +1;
-  
+
   grupo.add(index);
 
   index.rotation.z = Math.PI/2;
@@ -480,7 +480,7 @@ function onKeyDown(e) {
     case 65: //a
       ball3.translateZ(0.01);
       break;
-    
+
     case 69:  //E
           right_cannon.toggleSelectedCannon();
           break;
@@ -543,12 +543,12 @@ function render() {
 
 function animate() {
   //Renders Scene
-  //checkMove();  
-  
+  //checkMove();
+
   render();
-    
+
   requestAnimationFrame(animate);
-    
+
 }
 
 function init() {
