@@ -24,7 +24,6 @@ var ratio = 2.07;
 var scale = 0.013
 
 var clock = new THREE.Clock();
-var new_bulet_allowed = true;
 
 class Base_Object extends THREE.Object3D{
   constructor(){
@@ -437,9 +436,9 @@ function createScene() {
 
 
     new Wall(0,0,0);
-    left_cannon = new Cannon(51, 1, 25, -Math.PI/16);
-    middle_cannon = new Cannon(51, 1, 0, 0);
-    right_cannon = new Cannon(51, 1, -25, Math.PI/16);
+    left_cannon = new Cannon(51, 4, 25, -Math.PI/16);
+    middle_cannon = new Cannon(51, 4, 0, 0);
+    right_cannon = new Cannon(51, 4, -25, Math.PI/16);
     selected_cannon = middle_cannon;
     new Ball(-20,4,0);
     new Ball(20,4,0);
@@ -545,7 +544,7 @@ function onKeyDown(e) {
     case 82: //r
         if(Axistf){
           for(var i = 4; i < grupo.children.length; i++){
-            //console.log(grupo.children[i]);
+            console.log(grupo.children[i]);
             grupo.children[i].toggleoffAxisHelper();
           }
           Axistf = false;
