@@ -28,6 +28,7 @@ var scale_height;
 var last_width;
 var last_height;
 
+var clock = new THREE.Clock();
 var new_bulet_allowed = true;
 
 var ratio = 2.07;
@@ -79,6 +80,15 @@ class Cannon extends Base_Object {
     super();
     createCannon(this, x, y, z, rotY);
     this.rotY = rotY;
+    if (rotY == 0){
+      this.ball_position = [75, 0, -5];
+    }
+    else if (rotY == Math.PI/16){
+      this.ball_position = [75, 0, -30];
+    }
+    else if (rotY == -Math.PI/16) {
+      this.ball_position = [75, 0, 20];
+    }
   }
 
   toggleSelectedCannon(){
@@ -117,6 +127,10 @@ class Cannon extends Base_Object {
   toggleRightMovement(){
     selected_cannon.rotateX(-0.05);
   }
+  shootBall(){
+    this.ball = new Ball(this.ball_position[0], this.ball_position[1], this.ball_position[2]);
+    this.ball.position.set(this.ball_position[0], this.ball_position[1], this.ball_position[2]);
+  }
 
   myType(){
     return "Cannon";
@@ -126,9 +140,22 @@ class Cannon extends Base_Object {
 class Ball extends Base_Object {
   constructor(x, y, z){
     super();
+    this.velocity = new THREE.Vector3();
+    this.velocity.set(1, 0,	 0);
     createBall(x, y, z);
   }
 
+  update_position(ticks){
+    //var oldvelocity = new THREE.Vector3().copy(this.velocity);
+		var oldposition = new THREE.Vector3().copy(this.position);
+
+    //var newvelocity = (oldvelocity.addScaledVector(this.aceleration, delta));
+
+    var newposition = oldposition.add(this.velocity);
+
+    this.position.copy(newposition);
+
+  }
   myType(){
     return "Ball";
   }
@@ -301,7 +328,10 @@ function rotate() {
   console.log(meshes[0].matrix.elements);
 
 }
-
+ function checkMove(){
+   var ticks = clock.getDelta();
+   selected_cannon.ball.update_position(ticks);
+ }
 
 function createScene() {
     'use strict';
@@ -316,9 +346,9 @@ function createScene() {
     middle_cannon = new Cannon(55, 5, -30, 0);
     right_cannon = new Cannon(55, 5, -55, Math.PI/16);
     selected_cannon = middle_cannon;
-    ball = new Ball(75,0,-30);
-    ball1 = new Ball(75,0,-5);
-    ball2 = new Ball(75,0,20);
+    //ball = new Ball(75,0,-30);
+    //ball1 = new Ball(75,0,-5);
+    //ball2 = new Ball(75,0,20);
     create_matrixR(Math.PI/2);
     rotate();
     ball3 = new Ball(-5, 0, -5);
@@ -384,7 +414,9 @@ function onKeyDown(e) {
     'use strict';
 
     switch (e.keyCode) {
-
+      case 32: //Space
+        selected_cannon.shootBall();
+        break;
       case 52: //4
         wires = !wires;
         for(var i = 0, l = 5; i < l; i++){
@@ -462,6 +494,7 @@ function render() {
 
 function animate() {
   //Renders Scene
+    //checkMove();
     render();
     requestAnimationFrame(animate);
 
