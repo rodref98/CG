@@ -107,13 +107,13 @@ class Cannon extends Base_Object {
     createCannon(this, x, y, z, rotY);
     this.rotY = rotY;
     if (this.rotY == 0){
-      this.ball_position = [55, 5, -30];
+      this.ball_position = [55, 5, 0];
     }
     else if (this.rotY == Math.PI/16){
-      this.ball_position = [55, 5, -55];
+      this.ball_position = [55, 5, -25];
     }
     else if (this.rotY == -Math.PI/16) {
-      this.ball_position = [55, 5, -5];
+      this.ball_position = [55, 5, 25];
     }
   }
 
