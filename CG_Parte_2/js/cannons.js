@@ -8,7 +8,7 @@ var active_camera = 0;
 var moveForward = false;
 var moveBackwards = false;
 var breakFB = false;
-
+var clock = new THREE.Clock();
 var scene, renderer;
 
 var geometry, material, mesh;
@@ -16,14 +16,30 @@ var meshes = [];
 var merged_geo = new THREE.Geometry();
 
 var table, left_cannon, middle_cannon, right_cannon;
-var ball,ball1,ball2,ball3;
+var ball,ball1,ball2,ball3,bullet;
+var balls = [];
 var selected_cannon;
 
 class Base_Object extends THREE.Object3D{
   constructor(){
     super();
+    this.velocity = new THREE.Vector3();
+		this.aceleration = new THREE.Vector3();
+		this.maxvelocity = new THREE.Vector3();
+		this.minvelocity = new THREE.Vector3();
   }
+  updatepos(delta){
+    
+    var oldvel = new THREE.Vector3().copy(this.velocity);
+    var oldpos = new THREE.Vector3().copy(this.position);
+    
+    var nvel = (oldvel.addScaledVector(this.aceleration, delta)).clamp(this.minvelocity, this.maxvelocity);
+    var npos = oldpos.add(nvel);
+    
+    this.velocity.copy(nvel);
+		this.position.copy(npos);
 
+  }
   toggleWireframe(wire) {
     this.children[0].material.wireframe = wire;
   }
@@ -60,7 +76,6 @@ class Cannon extends Base_Object {
       meshes[1].material.color.set(0x1E90FF);
       meshes[4].material.color.set(0x1E90FF);
       meshes[5].material.color.set(0x1E90FF);
-      selected_cannon = middle_cannon;
     }
     else if (this.rotY == -Math.PI/16) {
       meshes[0].material.color.set(0xff0000);
@@ -69,7 +84,6 @@ class Cannon extends Base_Object {
       meshes[3].material.color.set(0x1E90FF);
       meshes[4].material.color.set(0x1E90FF);
       meshes[5].material.color.set(0x1E90FF);
-      selected_cannon = left_cannon;
     }
     else if (this.rotY == Math.PI/16) {
       meshes[4].material.color.set(0xff0000);
@@ -78,17 +92,8 @@ class Cannon extends Base_Object {
       meshes[1].material.color.set(0x1E90FF);
       meshes[2].material.color.set(0x1E90FF);
       meshes[3].material.color.set(0x1E90FF);
-      selected_cannon = right_cannon;
     }
   }
-
-  toggleLeftMovement(){
-    selected_cannon.rotateX(0.05);
-  }
-  toggleRightMovement(){
-    selected_cannon.rotateX(-0.05);
-  }
-
   myType(){
     return "Cannon";
   }
@@ -97,12 +102,21 @@ class Cannon extends Base_Object {
 class Ball extends Base_Object {
   constructor(x, y, z){
     super();
+    
+    this.velocity.set(-1, 0,0);
+		this.maxvelocity.set(-1, 0, 0);
+    this.minvelocity.set(1, 0, 0);
     createBall(x, y, z);
   }
 
   myType(){
     return "Ball";
   }
+}
+
+class Bullet extends Base_Object{
+
+  
 }
 
 function addBall(obj, x, y, z) {
@@ -192,6 +206,8 @@ function createWall(x, y, z) {
 function createCannon(index, x, y, z, rotY) {
     'use strict';
 
+    index = new THREE.Object3D();
+
     material = new THREE.MeshBasicMaterial({ color: 0x1E90FF, wireframe: true });
 
     //index.material.color.set(0xff0000);
@@ -217,7 +233,7 @@ function createBall(x, y, z) {
 
   material = new THREE.MeshBasicMaterial({ color: 0x00ff00, wireframe: true });
   addBall(ball,-20,5,-25);
-
+  
 
   ball.position.x = x;
   ball.position.y = y;
@@ -238,12 +254,8 @@ function createScene() {
     left_cannon = new Cannon(55, 5, -5, -Math.PI/16);
     middle_cannon = new Cannon(55, 5, -30, 0);
     right_cannon = new Cannon(55, 5, -55, Math.PI/16);
-    selected_cannon = middle_cannon;
-    ball = new Ball(75,0,-30);
-    ball1 = new Ball(75,0,-5);
-    ball2 = new Ball(75,0,20);
-    ball3 = new Ball(75,0,-30);
-
+    ball1 = new Ball(-5, 0, -5);
+    
 
 }
 
@@ -325,14 +337,10 @@ function onKeyDown(e) {
         break;
 
     case 37://left arrow
-        selected_cannon.toggleLeftMovement();
-        break
     case 38://forward arrow
         moveForward = true;
         break;
     case 39://right arrow
-        selected_cannon.toggleRightMovement();
-        break
     case 40://backwards arrow
         moveBackwards = true;
         break;
@@ -355,7 +363,10 @@ function onKeyDown(e) {
             }
           });
           break;
-
+    case 32: //spacebar
+          bullet = new Ball(75,0,-5);
+          balls.push(bullet);
+          break;
     }
 }
 
@@ -380,8 +391,19 @@ function render() {
 
 
 function animate() {
-	//Renders Scene
-	render();
+  //Renders Scene
+  var delta = clock.getDelta();
+  var i = 0;
+	var l = balls.length;
+   
+
+  while (i < l) {
+    
+    balls[i].updatepos(delta); 
+		i = i + 1;
+		l = balls.length;
+  }
+  render();
 
 	requestAnimationFrame(animate);
 }
