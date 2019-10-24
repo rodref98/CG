@@ -11,19 +11,36 @@ var breakFB = false;
 
 var scene, renderer;
 
+var wires = true;
+var grupo = new THREE.Group();
 var geometry, material, mesh;
 var meshes = [];
-var merged_geo = new THREE.Geometry();
 
 var table, left_cannon, middle_cannon, right_cannon;
-var ball,ball1,ball2;
+var ball,ball1,ball2, ball3;
 var selected_cannon;
 var matrix_rotate;
+
+var ratio = 2.07;
+var scale = 0.013
+var scale_width;
+var scale_height;
+var last_width;
+var last_height;
+
+var new_bulet_allowed = true;
 
 class Base_Object extends THREE.Object3D{
   constructor(){
     super();
-  }
+		this.velocity = new THREE.Vector3();
+		this.aceleration = new THREE.Vector3();
+		this.maxvel = new THREE.Vector3();
+		this.minvel = new THREE.Vector3();
+		this.width = 0;
+		this.height = 0;
+		this.radius = 0;
+	}
 
   toggleWireframe(wire) {
     this.children[0].material.wireframe = wire;
@@ -32,6 +49,7 @@ class Base_Object extends THREE.Object3D{
   myType(){
     return "Object";
   }
+  
 
 }
 
@@ -106,13 +124,55 @@ class Ball extends Base_Object {
   }
 }
 
-function addBall(obj, x, y, z) {
+function createBall(x, y, z) {
+  'use strict';
+
+  ball = new THREE.Object3D();
+
+  material = new THREE.MeshBasicMaterial({ color: 0x00ff00, wireframe: wires });
+  geometry = new THREE.SphereGeometry(4, 16 ,12);
+  mesh = new THREE.Mesh(geometry, material);
+  mesh.position.set(-20,5,-25);
+  ball.add(mesh);
+  //addBall(ball,-20,5,-25);
+
+
+  ball.position.x = x;
+  ball.position.y = y;
+  ball.position.z = z;
+  grupo.add(ball);
+}
+
+
+
+/*function addBall(obj, x, y, z) {
     'use strict';
     geometry = new THREE.SphereGeometry(4, 16 ,12);
     mesh = new THREE.Mesh(geometry, material);
     mesh.position.set(x, y , z);
     obj.add(mesh);
+}*/
+
+
+function createWall(x, y, z) {
+    'use strict';
+
+    table = new THREE.Object3D();
+
+    material = new THREE.MeshBasicMaterial({ color: 0xffe4b5, wireframe: wires });
+    addGroundWall(table, 0, -1, -30);
+    material = new THREE.MeshBasicMaterial({ color: 0x00ff00, wireframe: wires });
+    addSideWall(table, 0, 5, 0);
+    addSideWall(table, 0, 5, -60);
+    addBackWall(table, -29, 5, -30);
+
+    table.position.x = x;
+    table.position.y = y;
+    table.position.z = z;
+    grupo.add(table);
 }
+
+
 
 function addGroundWall(obj, x, y, z) {
   'use strict';
@@ -138,24 +198,41 @@ function addBackWall(obj, x, y, z) {
     obj.add(mesh);
 }
 
+
+function createCannon(index, x, y, z, rotY) {
+  'use strict';
+
+  material = new THREE.MeshBasicMaterial({ color: 0x1E90FF, wireframe: wires });
+
+  addCannonCylinder(index, 0, 10, 0);
+  addCannonArtic(index, 0, 0, 0);
+  if (rotY == 0){
+    meshes[2].material.color.set(0xff0000);
+    meshes[3].material.color.set(0xff0000);
+  }
+  grupo.add(index);
+
+  index.rotation.z = Math.PI/2;
+  index.rotation.y = rotY;
+  index.position.x = x;
+  index.position.y = y;
+  index.position.z = z;
+}
+
 function addCannonCylinder(obj, x, y, z) {
     'use strict';
 
     geometry = new THREE.CylinderGeometry(4.5, 4.5, 20, 32, 0, true);
     mesh = new THREE.Mesh(geometry, material);
 
-    obj.add(mesh);
     mesh.position.set(x, y, z);
     meshes.push(mesh);
-    //meshes[0].updateMatrix();
-    //merged_geo.merge(meshes[0].geometry, meshes[0].matrix);
-    //obj.children.material.color.set(0xff0000);
+
     obj.add(mesh);
 }
 
 function addCannonArtic(obj, x, y, z){
 
-    material = new THREE.MeshBasicMaterial( { color: 0x1E90FF, wireframe: true } );
     geometry = new THREE.SphereBufferGeometry(4.5, 8, 6, 0, 2*Math.PI, Math.PI/2, 0.5 * Math.PI);
     material.side = THREE.DoubleSide;
     mesh = new THREE.Mesh(geometry, material);
@@ -170,61 +247,8 @@ function addCannonArtic(obj, x, y, z){
 }
 
 
-function createWall(x, y, z) {
-    'use strict';
-
-    table = new THREE.Object3D();
-
-    material = new THREE.MeshBasicMaterial({ color: 0xffe4b5, wireframe: true });
-    addGroundWall(table, 0, -1, -30);
-    material = new THREE.MeshBasicMaterial({ color: 0x00ff00, wireframe: true });
-    addSideWall(table, 0, 5, 0);
-    addSideWall(table, 0, 5, -60);
-    addBackWall(table, -29, 5, -30);
-
-    table.position.x = x;
-    table.position.y = y;
-    table.position.z = z;
-    scene.add(table);
-}
 
 
-
-function createCannon(index, x, y, z, rotY) {
-    'use strict';
-
-    material = new THREE.MeshBasicMaterial({ color: 0x1E90FF, wireframe: true });
-
-    //index.material.color.set(0xff0000);
-    addCannonCylinder(index, 0, 10, 0);
-    addCannonArtic(index, 0, 0, 0);
-    if (rotY == 0){
-      meshes[2].material.color.set(0xff0000);
-      meshes[3].material.color.set(0xff0000);
-    }
-    scene.add(index);
-
-    index.rotation.z = Math.PI/2;
-    index.rotation.y = rotY;
-    index.position.x = x;
-    index.position.y = y;
-    index.position.z = z;
-}
-
-function createBall(x, y, z) {
-  'use strict';
-
-  ball = new THREE.Object3D();
-
-  material = new THREE.MeshBasicMaterial({ color: 0x00ff00, wireframe: true });
-  addBall(ball,-20,5,-25);
-
-
-  ball.position.x = x;
-  ball.position.y = y;
-  ball.position.z = z;
-  scene.add(ball);
-}
 
 function create_matrixR(x) {
   matrix_rotate = new Float32Array(16);
@@ -285,10 +309,15 @@ function createScene() {
     ball = new Ball(75,0,-30);
     ball1 = new Ball(75,0,-5);
     ball2 = new Ball(75,0,20);
+<<<<<<< HEAD
     create_matrixR(Math.PI/2);
     rotate();
 
 
+=======
+    ball3 = new Ball(-5, 0, -5);
+    scene.add(grupo);
+>>>>>>> 46aecadfb3847aefdbf3d10b62ee13211f6bfeb4
 
 }
 
@@ -296,23 +325,23 @@ function createScene() {
 function createCamera3() {
     'use strict';
 
-    camera1[2] = new THREE.OrthographicCamera( -70, 70, 40, -40, 1, 1000 );
+    camera1[2] = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, 100); 
 
-
-    camera1[2].position.x = -2.5;
-    camera1[2].position.y = 0;
-    camera1[2].position.z = 0;
-    camera1[2].lookAt(scene.position);
+    camera1[2].position.x = -5;
+    camera1[2].position.y = 10;
+    camera1[2].position.z = -5;
+    middle_cannon.add(camera1[2]);
+    camera1[2].lookAt( new THREE.Vector3(0, 0, 0) );
 }
 //Camara lateral
 function createCamera2() {
     'use strict';
 
-    camera1[1] = new THREE.OrthographicCamera( -70, 70, 40, -40, 1, 1000 );
+    camera1[1] = new THREE.PerspectiveCamera( 45, 1920/1080, 1, 1000);
 
 
     camera1[1].position.x =0;
-    camera1[1].position.y = 0;
+    camera1[1].position.y = 40;
     camera1[1].position.z = 100;
     camera1[1].lookAt(scene.position);
 }
@@ -350,12 +379,12 @@ function onKeyDown(e) {
     'use strict';
 
     switch (e.keyCode) {
-    case 52: //4
-        scene.traverse(function (node) {
-            if (node instanceof THREE.Mesh) {
-                node.material.wireframe = !node.material.wireframe;
-            }
-        });
+      
+      case 52: //4
+        wires = !wires;
+        for(var i = 0, l = 5; i < l; i++){
+          grupo.children[i].children[0].material.wireframe= wires;
+        }
         break;
     case 49: //1
         switch_camera(0);
@@ -382,6 +411,8 @@ function onKeyDown(e) {
         moveBackwards = true;
         break;
     case 65: //a
+      ball3.translateZ(0.01);
+      break;
     case 68: //d
     case 69:  //E
           right_cannon.toggleSelectedCannon();
@@ -425,10 +456,10 @@ function render() {
 
 
 function animate() {
-	//Renders Scene
-	render();
-
-	requestAnimationFrame(animate);
+  //Renders Scene
+    render();
+    requestAnimationFrame(animate);
+    
 }
 
 function init() {
