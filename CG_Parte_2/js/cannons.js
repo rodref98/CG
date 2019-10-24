@@ -12,13 +12,12 @@ var contador = 0;
 var geometry, material, mesh;
 var meshes = [];
 
-var table, left_cannon, middle_cannon, right_cannon;
-var ball_camera;
+var table, left_cannon, middle_cannon, right_cannon, ball_camera;
 var selected_cannon;
 var matrix_rotate;
 
-var width = 150;
-var height = 70;
+var width = 60;
+var height = 62;
 var ratio = 2.07;
 var scale = 0.013
 var scale_width;
@@ -60,13 +59,13 @@ class Base_Object extends THREE.Object3D{
 		else if (npos.x + this.width/2 > width/2) {
 			this.collideWallLR(npos, nvel, 1); // right wall (positive)
 		}
-		else if (npos.y + this.height/2 > height/2) {
+		else if (npos.z + this.height/2 > height/2) {
 			this.collideWallTB(npos, nvel, 1); // top wall (positive)
 		}
-		else if (npos.y - this.height/2 < -height/2) {
+		else if (npos.z - this.height/2 < -height/2) {
 			this.collideWallTB(npos, nvel, -1); // bottom wall (negative)
     }
-    
+
 
 		//proceeds movement after checking for potential wall hits
 		this.velocity.copy(nvel);
@@ -107,14 +106,14 @@ class Cannon extends Base_Object {
     super();
     createCannon(this, x, y, z, rotY);
     this.rotY = rotY;
-    if (rotY == 0){
-      this.ball_position = [55, 5, -30];
+    if (this.rotY == 0){
+      this.ball_position = [55, 4, 0];
     }
-    else if (rotY == Math.PI/16){
-      this.ball_position = [55, 5, -55];
+    else if (this.rotY == Math.PI/16){
+      this.ball_position = [55, 4, -25];
     }
-    else if (rotY == -Math.PI/16) {
-      this.ball_position = [55, 5, -5];
+    else if (this.rotY == -Math.PI/16) {
+      this.ball_position = [55, 4, 25];
     }
   }
 
@@ -181,8 +180,8 @@ class Ball extends Base_Object {
 	}
 
 	collideWallTB(npos, nvel, side) { // side = -1 -> bottom / side = 1 -> top
-		npos.setY( (height/2 - this.height/2) * side);
-		nvel.setY(nvel.y * -1);
+		npos.setZ( (height/2 - this.height/2) * side);
+		nvel.setZ(nvel.z * -1);
 		return npos, nvel;
 	}
 
@@ -262,11 +261,11 @@ function createWall(table, x, y, z) {
 
 
     material = new THREE.MeshBasicMaterial({ color: 0x7FFFD4, wireframe: wires });
-    addGroundWall(table, 0, -1, -30);
+    addGroundWall(table, 0, 0, 0);
     //material = new THREE.MeshBasicMaterial({ color: 0x00ff00, wireframe: wires });
-    addSideWall(table, 0, 5, 0);
-    addSideWall(table, 0, 5, -60);
-    addBackWall(table, -29, 5, -30);
+    addSideWall(table, 0, 5, -30);
+    addSideWall(table, 0, 5, 30);
+    addBackWall(table, -29, 5, 0);
 
     material = new THREE.MeshBasicMaterial({ color: 0xffe4b5, wireframe: wires });
     material.transparent = true;
@@ -284,7 +283,7 @@ function createWall(table, x, y, z) {
 
 function addGroundWall(obj, x, y, z) {
   'use strict';
-  geometry = new THREE.CubeGeometry(60, 2, 62);
+  geometry = new THREE.CubeGeometry(60, 0, 62);
   mesh = new THREE.Mesh(geometry, material);
   mesh.position.set(x, y, z);
   obj.add(mesh);
@@ -400,7 +399,7 @@ function rotate() {
   console.log(meshes[0].matrix.elements);
 
 }
- 
+
 
 function createScene() {
     'use strict';
@@ -410,16 +409,16 @@ function createScene() {
     scene.add(new THREE.AxisHelper(100));
 
 
-    new Wall(-25,0,0);
-    left_cannon = new Cannon(55, 5, -5, -Math.PI/16);
-    middle_cannon = new Cannon(55, 5, -30, 0);
-    right_cannon = new Cannon(55, 5, -55, Math.PI/16);
+    new Wall(0,0,0);
+    left_cannon = new Cannon(55, 1, 25, -Math.PI/16);
+    middle_cannon = new Cannon(55, 1, 0, 0);
+    right_cannon = new Cannon(55, 1, -25, Math.PI/16);
     selected_cannon = middle_cannon;
-    ball_camera = new Ball (27,0,10);
-    new Ball(-10,0,0);
-    new Ball(27,0,-5);
-    new Ball(27,0,20);
-    new Ball(-5, 0, -5);
+    new Ball(-10,4,0);
+    new Ball(27,4,-5);
+    new Ball(27,4,20);
+    new Ball(-5, 4, -5);
+    ball_camera = new Ball(-7, 4, -7);
     scene.add(grupo);
 
 }
@@ -428,10 +427,10 @@ function createScene() {
 function createCamera3() {
     'use strict';
 
-    camera1[2] = new THREE.PerspectiveCamera(90, window.innerWidth / window.innerHeight, 1, 100);
+    camera1[2] = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, 100);
+
     ball_camera.add(camera1[2]);
     camera1[2].position.set(0, 10, 10);
-  
     camera1[2].lookAt( new THREE.Vector3(0, 0, 0) );
 }
 //Camara lateral
@@ -582,13 +581,13 @@ function render() {
 function animate() {
   //Renders Scene
   requestAnimationFrame(animate);
-  
-  checkMove();  
-  
+
+  checkMove();
+
   render();
-    
-  
-    
+
+
+
 }
 
 function init() {
