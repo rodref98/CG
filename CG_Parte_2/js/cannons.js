@@ -13,11 +13,11 @@ var scene, renderer;
 
 var wires = true;
 var grupo = new THREE.Group();
+var contador = 0;
 var geometry, material, mesh;
 var meshes = [];
 
 var table, left_cannon, middle_cannon, right_cannon;
-var ball,ball1,ball2, ball3;
 var selected_cannon;
 
 var ratio = 2.07;
@@ -41,9 +41,33 @@ class Base_Object extends THREE.Object3D{
 		this.radius = 0;
 	}
 
-  toggleWireframe(wire) {
-    this.children[0].material.wireframe = wire;
-  }
+  updatepos(delta) {
+		var oldvel = new THREE.Vector3().copy(this.velocity);
+		var oldpos = new THREE.Vector3().copy(this.position);
+
+		// v = a * delta; limits velocity within a maximum and minimum value
+		var nvel = (oldvel.addScaledVector(this.aceleration, delta)).clamp(this.minvel, this.maxvel);
+		// x = x0 + v
+		var npos = oldpos.add(nvel);
+
+		/*Checks if object will hit a Wall/Limit before it happens and acts accordingly*/
+		if (npos.x - this.width/2 < -width/2) {
+			this.collideWallLR(npos, nvel, -1); // left wall (negative)
+		}
+		else if (npos.x + this.width/2 > width/2) {
+			this.collideWallLR(npos, nvel, 1); // right wall (positive)
+		}
+		else if (npos.y + this.height/2 > height/2) {
+			this.collideWallTB(npos, nvel, 1); // top wall (positive)
+		}
+		else if (npos.y - this.height/2 < -height/2) {
+			this.collideWallTB(npos, nvel, -1); // bottom wall (negative)
+		}
+
+		//proceeds movement after checking for potential wall hits
+		this.velocity.copy(nvel);
+		this.position.copy(npos);
+	}
 
   myType(){
     return "Object";
@@ -115,7 +139,7 @@ class Cannon extends Base_Object {
 class Ball extends Base_Object {
   constructor(x, y, z){
     super();
-    createBall(x, y, z);
+    createBall(this, x, y, z);
   }
 
   myType(){
@@ -123,23 +147,23 @@ class Ball extends Base_Object {
   }
 }
 
-function createBall(x, y, z) {
+function createBall(obj, x, y, z) {
   'use strict';
 
-  ball = new THREE.Object3D();
 
-  material = new THREE.MeshBasicMaterial({ color: 0x00ff00, wireframe: wires });
-  geometry = new THREE.SphereGeometry(4, 16 ,12);
-  mesh = new THREE.Mesh(geometry, material);
-  mesh.position.set(x, y, z);
-  ball.add(mesh);
+  var kmaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00, wireframe: wires });
+  var kgeometry = new THREE.SphereGeometry(4, 16 ,12);
+  var kmesh = new THREE.Mesh(kgeometry, kmaterial);
+  //mesh.position.set(x, y, z);
+  obj.add(kmesh);
   //addBall(ball,-20,5,-25);
 
 
-  ball.position.x = x;
-  ball.position.y = y;
-  ball.position.z = z;
-  grupo.add(ball);
+  obj.position.x = x;
+  obj.position.y = y;
+  obj.position.z = z;
+  contador = contador +1;
+  grupo.add(obj);
 }
 
 
@@ -158,16 +182,22 @@ function createWall(x, y, z) {
 
     table = new THREE.Object3D();
 
-    material = new THREE.MeshBasicMaterial({ color: 0xffe4b5, wireframe: wires });
+    material = new THREE.MeshBasicMaterial({ color: 0x7FFFD4, wireframe: wires });
     addGroundWall(table, 0, -1, -30);
-    material = new THREE.MeshBasicMaterial({ color: 0x00ff00, wireframe: wires });
+    //material = new THREE.MeshBasicMaterial({ color: 0x00ff00, wireframe: wires });
     addSideWall(table, 0, 5, 0);
     addSideWall(table, 0, 5, -60);
     addBackWall(table, -29, 5, -30);
+    
+    material = new THREE.MeshBasicMaterial({ color: 0xffe4b5, wireframe: wires });
+    material.transparent = true;
+    material.opacity =  0.5*Math.sin(new Date().getTime() * .0025);
+    addBackWall(table, 29, 5, -30);
 
     table.position.x = x;
     table.position.y = y;
     table.position.z = z;
+    contador = contador +1;
     grupo.add(table);
 }
 
@@ -183,7 +213,7 @@ function addGroundWall(obj, x, y, z) {
 
 function addSideWall(obj, x, y, z) {
     'use strict';
-    geometry = new THREE.CubeGeometry(60, 10, 2);
+    geometry = new THREE.CubeGeometry(60, 15, 2);
     mesh = new THREE.Mesh(geometry, material);
     mesh.position.set(x, y, z);
     obj.add(mesh);
@@ -191,7 +221,7 @@ function addSideWall(obj, x, y, z) {
 
 function addBackWall(obj, x, y, z) {
     'use strict';
-    geometry = new THREE.CubeGeometry(2, 10, 60);
+    geometry = new THREE.CubeGeometry(2, 15, 60);
     mesh = new THREE.Mesh(geometry, material);
     mesh.position.set(x, y, z);
     obj.add(mesh);
@@ -202,13 +232,14 @@ function createCannon(index, x, y, z, rotY) {
   'use strict';
 
   material = new THREE.MeshBasicMaterial({ color: 0x1E90FF, wireframe: wires });
-
   addCannonCylinder(index, 0, 10, 0);
   addCannonArtic(index, 0, 0, 0);
   if (rotY == 0){
     meshes[2].material.color.set(0xff0000);
     meshes[3].material.color.set(0xff0000);
   }
+  contador = contador +1;
+  
   grupo.add(index);
 
   index.rotation.z = Math.PI/2;
@@ -263,10 +294,11 @@ function createScene() {
     middle_cannon = new Cannon(55, 5, -30, 0);
     right_cannon = new Cannon(55, 5, -55, Math.PI/16);
     selected_cannon = middle_cannon;
-    ball = new Ball(27,0,0);
-    ball1 = new Ball(75,0,-5);
-    ball2 = new Ball(75,0,20);
-    ball3 = new Ball(-5, 0, -5);
+    new Ball(-10,0,0);
+    new Ball(27,0,-5);
+    new Ball(27,0,20);
+    new Ball(-5, 0, -5);
+    console.log(grupo.children);
     scene.add(grupo);
 
 }
@@ -332,7 +364,8 @@ function onKeyDown(e) {
       
       case 52: //4
         wires = !wires;
-        for(var i = 0, l = 5; i < l; i++){
+        //console.log(grupo.lenght);
+        for(var i = 0; i < contador; i++){
           grupo.children[i].children[0].material.wireframe= wires;
         }
         break;
@@ -363,7 +396,7 @@ function onKeyDown(e) {
     case 65: //a
       ball3.translateZ(0.01);
       break;
-    case 68: //d
+    
     case 69:  //E
           right_cannon.toggleSelectedCannon();
           break;
@@ -374,7 +407,7 @@ function onKeyDown(e) {
     case 87: //w
           middle_cannon.toggleSelectedCannon();
           break;
-    case 101: //e
+    case 68: //d
           scene.traverse(function (node) {
             if (node instanceof THREE.AxisHelper) {
               node.visible = !node.visible;
@@ -399,6 +432,25 @@ function onKeyUp(e) {
   }
 }
 
+
+/*function checkMove() {
+	var delta = clock.getDelta();
+
+	//Cannon.updatepos(delta);	//Cannon movement
+
+	var i = 0;
+	var l = objectsgroup.children.length;
+
+	while (i < l) {
+		objectsgroup.children[i].updatepos(delta); //aliens and bullet movement
+		i = i + 1;
+		l = objectsgroup.children.length;
+	}
+
+	//Checks for collisions of certain objects
+	handleCollisions();
+}*/
+
 function render() {
 	renderer.render(scene, camera1[active_camera]);
 }
@@ -407,8 +459,11 @@ function render() {
 
 function animate() {
   //Renders Scene
-    render();
-    requestAnimationFrame(animate);
+  //checkMove();  
+  
+  render();
+    
+  requestAnimationFrame(animate);
     
 }
 
