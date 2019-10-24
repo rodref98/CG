@@ -16,8 +16,8 @@ var table, left_cannon, middle_cannon, right_cannon, ball_camera;
 var selected_cannon;
 var matrix_rotate;
 
-var width = 150;
-var height = 70;
+var width = 50;
+var height = 50;
 var ratio = 2.07;
 var scale = 0.013
 var scale_width;
@@ -59,10 +59,10 @@ class Base_Object extends THREE.Object3D{
 		else if (npos.x + this.width/2 > width/2) {
 			this.collideWallLR(npos, nvel, 1); // right wall (positive)
 		}
-		else if (npos.y + this.height/2 > height/2) {
+		else if (npos.z + this.height/2 > height/2) {
 			this.collideWallTB(npos, nvel, 1); // top wall (positive)
 		}
-		else if (npos.y - this.height/2 < -height/2) {
+		else if (npos.z - this.height/2 < -height/2) {
 			this.collideWallTB(npos, nvel, -1); // bottom wall (negative)
     }
 
@@ -183,8 +183,8 @@ class Ball extends Base_Object {
 	}
 
 	collideWallTB(npos, nvel, side) { // side = -1 -> bottom / side = 1 -> top
-		npos.setY( (height/2 - this.height/2) * side);
-		nvel.setY(nvel.y * -1);
+		npos.setZ( (height/2 - this.height/2) * side);
+		nvel.setZ(nvel.z * -1);
 		return npos, nvel;
 	}
 
