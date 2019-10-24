@@ -18,6 +18,7 @@ var merged_geo = new THREE.Geometry();
 var table, left_cannon, middle_cannon, right_cannon;
 var ball,ball1,ball2;
 var selected_cannon;
+var matrix_rotate;
 
 class Base_Object extends THREE.Object3D{
   constructor(){
@@ -225,6 +226,48 @@ function createBall(x, y, z) {
   scene.add(ball);
 }
 
+function create_matrixR(x) {
+  matrix_rotate = new Float32Array(16);
+
+  matrix_rotate[0] = Math.cos(x);
+  matrix_rotate[1] = -Math.sin(x);
+  matrix_rotate[2] = 0;
+  matrix_rotate[4] = Math.sin(x);
+  matrix_rotate[5] = Math.cos(x);
+  matrix_rotate[6] = 0;
+  matrix_rotate[8] = 0;
+  matrix_rotate[9] = 0;
+  matrix_rotate[10] = 1;
+
+
+}
+function rotate() {
+  var result = new Float32Array(16);
+  var resultb = new Float32Array(16);
+  var resultMatrix = new THREE.Matrix4();
+  for (var i = 0; i < 3; i++) {
+    for (var j = 0; j < 3; j++) {
+      var sum = 0;
+      var sumb = 0;
+      for (var k = 0; k < 3; k++) {
+        if (undefined != meshes[0].matrix.elements){
+        sum += meshes[0].matrix.elements[4*i+k] * matrix_rotate[4*k+j];
+        sumb += meshes[1].matrix.elements[4*i+k] * matrix_rotate[4*k+j];
+        }
+      }
+      result[4*i+j] = sum;
+      resultb[4*i+j] = sumb;
+    }
+  }
+  resultMatrix.fromArray(result);
+  console.log(resultMatrix);
+  meshes[0].matrix = resultMatrix;
+
+  meshes[1].matrix.elements = resultb;
+  console.log(meshes[0].matrix.elements);
+
+}
+
 
 function createScene() {
     'use strict';
@@ -242,6 +285,8 @@ function createScene() {
     ball = new Ball(75,0,-30);
     ball1 = new Ball(75,0,-5);
     ball2 = new Ball(75,0,20);
+    create_matrixR(Math.PI/2);
+    rotate();
 
 
 
