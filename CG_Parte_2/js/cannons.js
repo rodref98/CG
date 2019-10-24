@@ -49,7 +49,7 @@ class Base_Object extends THREE.Object3D{
   myType(){
     return "Object";
   }
-  
+
 
 }
 
@@ -309,15 +309,10 @@ function createScene() {
     ball = new Ball(75,0,-30);
     ball1 = new Ball(75,0,-5);
     ball2 = new Ball(75,0,20);
-<<<<<<< HEAD
     create_matrixR(Math.PI/2);
     rotate();
-
-
-=======
     ball3 = new Ball(-5, 0, -5);
     scene.add(grupo);
->>>>>>> 46aecadfb3847aefdbf3d10b62ee13211f6bfeb4
 
 }
 
@@ -325,7 +320,7 @@ function createScene() {
 function createCamera3() {
     'use strict';
 
-    camera1[2] = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, 100); 
+    camera1[2] = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, 100);
 
     camera1[2].position.x = -5;
     camera1[2].position.y = 10;
@@ -379,7 +374,7 @@ function onKeyDown(e) {
     'use strict';
 
     switch (e.keyCode) {
-      
+
       case 52: //4
         wires = !wires;
         for(var i = 0, l = 5; i < l; i++){
@@ -459,7 +454,7 @@ function animate() {
   //Renders Scene
     render();
     requestAnimationFrame(animate);
-    
+
 }
 
 function init() {
