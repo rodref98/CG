@@ -5,12 +5,7 @@
 var camera1 = new Array(3);
 var active_camera = 0;
 
-var moveForward = false;
-var moveBackwards = false;
-var breakFB = false;
-
 var scene, renderer;
-
 var wires = true;
 var grupo = new THREE.Group();
 var contador = 0;
@@ -21,6 +16,8 @@ var table, left_cannon, middle_cannon, right_cannon;
 var selected_cannon;
 var matrix_rotate;
 
+var width = 150;
+var height = 70;
 var ratio = 2.07;
 var scale = 0.013
 var scale_width;
@@ -31,12 +28,6 @@ var last_height;
 var clock = new THREE.Clock();
 var new_bulet_allowed = true;
 
-var ratio = 2.07;
-var scale = 0.013
-var scale_width;
-var scale_height;
-var last_width;
-var last_height;
 
 var new_bulet_allowed = true;
 
@@ -73,11 +64,22 @@ class Base_Object extends THREE.Object3D{
 		}
 		else if (npos.y - this.height/2 < -height/2) {
 			this.collideWallTB(npos, nvel, -1); // bottom wall (negative)
-		}
+    }
+
 
 		//proceeds movement after checking for potential wall hits
 		this.velocity.copy(nvel);
 		this.position.copy(npos);
+  }
+  checkCollisions(ob) {
+		var ourPos = this.position;
+		var objPos = ob.position;
+		var dist = ourPos.distanceTo(objPos);
+		//Considering a sphere around each object if sum of radiuses is less than distance between both centers, a collision is detected
+		if(dist <= this.radius + ob.radius) {
+			//Collision treatment is handled by the object
+			this.treatCollision(ob);
+		}
 	}
 
   myType(){
@@ -88,7 +90,7 @@ class Base_Object extends THREE.Object3D{
 
 }
 
-class Wall extends Base_Object {
+class Wall extends THREE.Object3D {
   constructor(x, y, z){
     super();
     createWall(this, x, y, z);
@@ -164,12 +166,48 @@ class Cannon extends Base_Object {
 class Ball extends Base_Object {
   constructor(x, y, z){
     super();
+    this.width = 8;
+		this.height = 8;
+		this.radius = 4;
+    this.velocity.set( (2 * Math.random() ) - 1 , 0  , (2 * Math.random() )).normalize().multiplyScalar(0.5);
+    this.maxvel.set(1,1,1);
+    this.minvel.set(-1,-1,-1);
     createBall(this, x, y, z);
-    this.velocity = new THREE.Vector3();
-    this.velocity.set(1, 0,	 0);
   }
 
-  update_position(ticks){
+
+  collideWallLR(npos, nvel, side) { // side = -1 -> left / side = 1 -> right
+		npos.setX( (width/2 - this.width/2) * side);
+		nvel.setX(nvel.x * -1);
+		return npos, nvel;
+	}
+
+	collideWallTB(npos, nvel, side) { // side = -1 -> bottom / side = 1 -> top
+		npos.setY( (height/2 - this.height/2) * side);
+		nvel.setY(nvel.y * -1);
+		return npos, nvel;
+	}
+
+	treatCollision(obj){
+		//Alien-Alien collision should make them go the opposite direction
+		if(obj.myType() == "alien"){
+			this.velocity.multiplyScalar(-1);
+			obj.velocity.multiplyScalar(-1);
+		}
+		//Alien-Bullet collision should make both Bullet and Alien dissapear
+		if(obj.myType() == "bullet"){
+			objectsgroup.remove(obj);
+			objectsgroup.remove(this);
+		}
+  }
+  myType(){
+    return "Ball";
+  }
+
+}
+
+
+ /* update_position(ticks){
     //var oldvelocity = new THREE.Vector3().copy(this.velocity);
 		var oldposition = new THREE.Vector3().copy(this.position);
 
@@ -179,12 +217,18 @@ class Ball extends Base_Object {
 
     this.position.copy(newposition);
 
-  }
-  myType(){
-    return "Ball";
+  }*/
+
+
+  /*Iterates through objectsgroup in search for collisions*/
+function handleCollisions() {
+	for(var i = 4; i < grupo.children.length-1; i++){
+		//j = i + 1 -> important to avoid unecessary checks
+		for(var j = i+1; j < grupo.children.length; j++){
+			grupo.children[i].checkCollisions(grupo.children[j]);
+		}
   }
 }
-
 function createBall(obj, x, y, z) {
   'use strict';
 
@@ -215,10 +259,9 @@ function createBall(obj, x, y, z) {
 }*/
 
 
-function createWall(x, y, z) {
+function createWall(table, x, y, z) {
     'use strict';
 
-    table = new THREE.Object3D();
 
     material = new THREE.MeshBasicMaterial({ color: 0x7FFFD4, wireframe: wires });
     addGroundWall(table, 0, -1, -30);
@@ -229,7 +272,7 @@ function createWall(x, y, z) {
 
     material = new THREE.MeshBasicMaterial({ color: 0xffe4b5, wireframe: wires });
     material.transparent = true;
-    material.opacity =  0.5*Math.sin(new Date().getTime() * .0025);
+    material.opacity =  0;
     addBackWall(table, 29, 5, -30);
 
     table.position.x = x;
@@ -359,10 +402,7 @@ function rotate() {
   console.log(meshes[0].matrix.elements);
 
 }
- function checkMove(){
-   var ticks = clock.getDelta();
-   selected_cannon.ball.update_position(ticks);
- }
+
 
 function createScene() {
     'use strict';
@@ -372,7 +412,7 @@ function createScene() {
     scene.add(new THREE.AxisHelper(100));
 
 
-    createWall(-25, 0, 0);
+    new Wall(-25,0,0);
     left_cannon = new Cannon(55, 5, -5, -Math.PI/16);
     middle_cannon = new Cannon(55, 5, -30, 0);
     right_cannon = new Cannon(55, 5, -55, Math.PI/16);
@@ -449,7 +489,7 @@ function onKeyDown(e) {
       case 52: //4
         wires = !wires;
         //console.log(grupo.lenght);
-        for(var i = 0; i < contador; i++){
+        for(var i = 0; i < grupo.children.length; i++){
           grupo.children[i].children[0].material.wireframe= wires;
         }
         break;
@@ -518,9 +558,23 @@ function onKeyUp(e) {
 
 
 function checkMove() {
-	var ticks = clock.getDelta();
+	var delta = clock.getDelta();
 
-  selected_cannon.ball.update_position(ticks);
+	//Cannon.updatepos(delta);	//Cannon movement
+
+	var i = 4;
+  var l = grupo.children.length;
+  //console.log(grupo.children);
+
+	while (i < l) {
+    console.log(grupo.children[i]);
+		grupo.children[i].updatepos(delta); //aliens and bullet movement
+		i = i + 1;
+		l = grupo.children.length;
+	}
+
+	//Checks for collisions of certain objects
+	handleCollisions();
 }
 
 function render() {
@@ -531,11 +585,13 @@ function render() {
 
 function animate() {
   //Renders Scene
-  //checkMove();
+  requestAnimationFrame(animate);
+
+  checkMove();
 
   render();
 
-  requestAnimationFrame(animate);
+
 
 }
 
