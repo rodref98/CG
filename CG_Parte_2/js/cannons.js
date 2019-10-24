@@ -5,10 +5,6 @@
 var camera1 = new Array(3);
 var active_camera = 0;
 
-var moveForward = false;
-var moveBackwards = false;
-var breakFB = false;
-var clock = new THREE.Clock();
 var scene, renderer;
 
 var wires = true;
@@ -18,8 +14,7 @@ var geometry, material, mesh;
 var meshes = [];
 
 var table, left_cannon, middle_cannon, right_cannon;
-var ball,ball1,ball2,ball3,bullet;
-var balls = [];
+var ball_camera;
 var selected_cannon;
 var matrix_rotate;
 
@@ -33,14 +28,6 @@ var last_height;
 var clock = new THREE.Clock();
 var new_bulet_allowed = true;
 
-var ratio = 2.07;
-var scale = 0.013
-var scale_width;
-var scale_height;
-var last_width;
-var last_height;
-
-var new_bulet_allowed = true;
 
 class Base_Object extends THREE.Object3D{
   constructor(){
@@ -376,6 +363,7 @@ function createScene() {
     middle_cannon = new Cannon(55, 5, -30, 0);
     right_cannon = new Cannon(55, 5, -55, Math.PI/16);
     selected_cannon = middle_cannon;
+    ball_camera = new Ball (27,0,10);
     new Ball(-10,0,0);
     new Ball(27,0,-5);
     new Ball(27,0,20);
@@ -388,12 +376,10 @@ function createScene() {
 function createCamera3() {
     'use strict';
 
-    camera1[2] = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, 100);
-
-    camera1[2].position.x = -5;
-    camera1[2].position.y = 10;
-    camera1[2].position.z = -5;
-    middle_cannon.add(camera1[2]);
+    camera1[2] = new THREE.PerspectiveCamera(90, window.innerWidth / window.innerHeight, 1, 100);
+    ball_camera.add(camera1[2]);
+    camera1[2].position.set(0, 10, 10);
+  
     camera1[2].lookAt( new THREE.Vector3(0, 0, 0) );
 }
 //Camara lateral
