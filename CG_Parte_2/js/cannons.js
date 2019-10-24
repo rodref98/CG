@@ -18,19 +18,12 @@ var table, left_cannon, middle_cannon, right_cannon, ball_camera;
 var selected_cannon;
 var matrix_rotate;
 
-var width = 60;
-var height = 62;
+var x_limit = 60;
+var z_limit = 62;
 var ratio = 2.07;
 var scale = 0.013
-var scale_width;
-var scale_height;
-var last_width;
-var last_height;
 
 var clock = new THREE.Clock();
-var new_bulet_allowed = true;
-
-
 var new_bulet_allowed = true;
 
 class Base_Object extends THREE.Object3D{
@@ -38,10 +31,10 @@ class Base_Object extends THREE.Object3D{
     super();
 		this.velocity = new THREE.Vector3();
 		this.aceleration = new THREE.Vector3();
-		this.maxvel = new THREE.Vector3();
-		this.minvel = new THREE.Vector3();
-		this.width = 0;
-		this.height = 0;
+		this.maxvelocity = new THREE.Vector3();
+		this.minvelocity = new THREE.Vector3();
+		this.x_limit = 0;
+		this.z_limit = 0;
 		this.radius = 0;
 	}
 
@@ -50,22 +43,22 @@ class Base_Object extends THREE.Object3D{
 		var oldpos = new THREE.Vector3().copy(this.position);
 
 		// v = a * delta; limits velocity within a maximum and minimum value
-		var nvel = (oldvel.addScaledVector(this.aceleration , delta)).clamp(this.minvel, this.maxvel);
+		var nvel = (oldvel.addScaledVector(this.aceleration , delta)).clamp(this.minvelocity, this.maxvelocity);
 		// x = x0 + v
 		var npos = oldpos.add(nvel);
 
 		/*Checks if object will hit a Wall/Limit before it happens and acts accordingly*/
-		if (npos.x - this.width/2 < -width/2) {
-			this.collideWallLR(npos, nvel, -1); // left wall (negative)
+		if (npos.x - this.x_limit/2 < -x_limit/2) {
+			this.collideBackWall(npos, nvel, -1); // left wall (negative)
 		}
-		else if (npos.x + this.width/2 > (width+20)/2) {
+		else if (npos.x + this.x_limit/2 > (x_limit+20)/2) {
 			grupo.remove(this); // right wall (positive)
 		}
-		else if (npos.z + this.height/2 > height/2) {
-			this.collideWallTB(npos, nvel, 1); // top wall (positive)
+		else if (npos.z + this.z_limit/2 > z_limit/2) {
+			this.collideSideWall(npos, nvel, 1); // top wall (positive)
 		}
-		else if (npos.z - this.height/2 < -height/2) {
-			this.collideWallTB(npos, nvel, -1); // bottom wall (negative)
+		else if (npos.z - this.z_limit/2 < -z_limit/2) {
+			this.collideSideWall(npos, nvel, -1); // bottom wall (negative)
     }
 
 
@@ -169,13 +162,13 @@ class Cannon extends Base_Object {
 class Ball extends Base_Object {
   constructor(x, y, z){
     super();
-    this.width = 8;
-		this.height = 8;
+    this.x_limit = 8;
+		this.z_limit = 8;
 		this.radius = 4;
     this.velocity.set( (2 * Math.random() ) - 1 , 0  , (2 * Math.random() )-1).normalize().multiplyScalar(0.5);
     //this.aceleration.set(0, 0, 0);
-    this.maxvel.set(1,1,1);
-    this.minvel.set(-1,-1,-1);
+    this.maxvelocity.set(1,1,1);
+    this.minvelocity.set(-1,-1,-1);
     this.index = Axiscont;
     Axisvec[this.index] = new THREE.AxisHelper(7);
     Axiscont ++;
@@ -184,14 +177,14 @@ class Ball extends Base_Object {
   }
 
 
-  collideWallLR(npos, nvel, side) { // side = -1 -> left / side = 1 -> right
-		npos.setX( (width/2 - this.width/2) * side);
+  collideBackWall(npos, nvel, side) { // side = -1 -> left / side = 1 -> right
+		npos.setX( (x_limit/2 - this.x_limit/2) * side);
 		nvel.setX(nvel.x * -1);
 		return npos, nvel;
 	}
 
-	collideWallTB(npos, nvel, side) { // side = -1 -> bottom / side = 1 -> top
-		npos.setZ( (height/2 - this.height/2) * side);
+	collideSideWall(npos, nvel, side) { // side = -1 -> bottom / side = 1 -> top
+		npos.setZ( (z_limit/2 - this.z_limit/2) * side);
 		nvel.setZ(nvel.z * -1);
 		return npos, nvel;
   }
@@ -207,10 +200,10 @@ class Ball extends Base_Object {
 		if(obj.myType() == "Ball"){
       var aux = this.velocity;
       this.velocity = obj.velocity;
-      this.maxvel.set(0.02,0, 0.02);
+      this.maxvelocity.set(0.02,0, 0.02);
 			obj.velocity= aux;
 		}
-		//Ball-FinalWall collision should make both Bullet and Alien dissapear
+		//Ball-FinalWall collision should make Ball dissapear
 		if(obj.myType() == "Wall" && obj.mesh.material.color == 0xFF0000){
       //console.log("kapap");
 			objectsgroup.remove(this);
