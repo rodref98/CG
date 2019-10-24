@@ -359,14 +359,24 @@ function create_matrixR(x) {
   matrix_rotate = new Float32Array(16);
 
   matrix_rotate[0] = Math.cos(x);
-  matrix_rotate[1] = -Math.sin(x);
-  matrix_rotate[2] = 0;
-  matrix_rotate[4] = Math.sin(x);
-  matrix_rotate[5] = Math.cos(x);
+  matrix_rotate[1] = 0;
+  matrix_rotate[2] = Math.sin(x);
+  matrix_rotate[3] = 0;
+
+  matrix_rotate[4] = 0;
+  matrix_rotate[5] = 1;
   matrix_rotate[6] = 0;
-  matrix_rotate[8] = 0;
+  matrix_rotate[7] = 0;
+
+  matrix_rotate[8] = -Math.sin(x);
   matrix_rotate[9] = 0;
-  matrix_rotate[10] = 1;
+  matrix_rotate[10] = Math.cos(x);
+  matrix_rotate[11] = 0;
+
+  matrix_rotate[12] = 0;
+  matrix_rotate[13] = 0;
+  matrix_rotate[14] = 0;
+  matrix_rotate[15] = 1;
 
 
 }
@@ -374,25 +384,38 @@ function rotate() {
   var result = new Float32Array(16);
   var resultb = new Float32Array(16);
   var resultMatrix = new THREE.Matrix4();
-  for (var i = 0; i < 3; i++) {
-    for (var j = 0; j < 3; j++) {
+  var resultMatrixb = new THREE.Matrix4();
+  var v1 = new THREE.Vector3(0, 1, 0);
+
+
+  for (var i = 0; i < 4; i++) {
+    for (var j = 0; j < 4; j++) {
       var sum = 0;
       var sumb = 0;
-      for (var k = 0; k < 3; k++) {
+      for (var k = 0; k < 4; k++) {
         if (undefined != meshes[0].matrix.elements){
         sum += meshes[0].matrix.elements[4*i+k] * matrix_rotate[4*k+j];
         sumb += meshes[1].matrix.elements[4*i+k] * matrix_rotate[4*k+j];
         }
       }
       result[4*i+j] = sum;
+      resultMatrixb.elements[4*i+j] = sumb;
       resultb[4*i+j] = sumb;
     }
   }
-  resultMatrix.fromArray(result);
-  //console.log(resultMatrix);
-  meshes[0].matrix = resultMatrix;
-
-  meshes[1].matrix.elements = resultb;
+  resultMatrix.set(result[0], result[1], result[2], result[3],
+                  result[4], result[5], result[6], result[7],
+                  result[8], result[9], result[10], result[11],
+                  result[12], result[13], result[14], result[15]);
+  console.log(resultMatrix);
+  /*meshes[0].matrix.set(result[0], result[1], result[2], result[3],
+                  result[4], result[5], result[6], result[7],
+                  result[8], result[9], result[10], result[11],
+                  result[12], result[13], result[14], result[15]);*/
+  console.log(middle_cannon.matrix)
+  middle_cannon.matrix.rotateByAxis(v1, Math.PI/16);
+  meshes[1].matrix = resultMatrixb;
+  //console.log(meshes[0].matrix);
   //console.log(meshes[0].matrix.elements);
 
 }
@@ -415,6 +438,9 @@ function createScene() {
     new Ball(20,4,0);
     new Ball(-15, 4, 5);
     ball_camera = new Ball(15, 4, 5);
+    create_matrixR(Math.PI/16);
+    console.log(matrix_rotate);
+    rotate();
     scene.add(grupo);
 
 }
@@ -550,7 +576,7 @@ function checkMove() {
   //console.log(grupo.children);
   //console.log(grupo.children);
 	while (i < l) {
-    
+
 		grupo.children[i].updatepos(delta); //aliens and bullet movement
 		i = i + 1;
 		l = grupo.children.length;
