@@ -16,8 +16,8 @@ var table, left_cannon, middle_cannon, right_cannon, ball_camera;
 var selected_cannon;
 var matrix_rotate;
 
-var width = 50;
-var height = 50;
+var width = 60;
+var height = 62;
 var ratio = 2.07;
 var scale = 0.013
 var scale_width;
