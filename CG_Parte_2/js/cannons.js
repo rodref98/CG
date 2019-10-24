@@ -48,7 +48,7 @@ class Base_Object extends THREE.Object3D{
 		var oldpos = new THREE.Vector3().copy(this.position);
 
 		// v = a * delta; limits velocity within a maximum and minimum value
-		var nvel = (oldvel.addScaledVector(this.aceleration , delta)).clamp(this.minvel, this.maxvel);
+		var nvel = (oldvel.addScaledVector(this.aceleration, delta)).clamp(this.minvel, this.maxvel);
 		// x = x0 + v
 		var npos = oldpos.add(nvel);
 
@@ -56,8 +56,8 @@ class Base_Object extends THREE.Object3D{
 		if (npos.x - this.width/2 < -width/2) {
 			this.collideWallLR(npos, nvel, -1); // left wall (negative)
 		}
-		else if (npos.x + this.width/2 > (width+20)/2) {
-			grupo.remove(this); // right wall (positive)
+		else if (npos.x + this.width/2 > width/2) {
+			this.collideWallLR(npos, nvel, 1); // right wall (positive)
 		}
 		else if (npos.z + this.height/2 > height/2) {
 			this.collideWallTB(npos, nvel, 1); // top wall (positive)
@@ -107,13 +107,13 @@ class Cannon extends Base_Object {
     createCannon(this, x, y, z, rotY);
     this.rotY = rotY;
     if (this.rotY == 0){
-      this.ball_position = [32, 4, 0];
+      this.ball_position = [55, 4, 0];
     }
     else if (this.rotY == Math.PI/16){
-      this.ball_position = [32, 4, -20];
+      this.ball_position = [55, 4, -25];
     }
     else if (this.rotY == -Math.PI/16) {
-      this.ball_position = [32, 4, 20];
+      this.ball_position = [55, 4, 25];
     }
   }
 
@@ -156,7 +156,6 @@ class Cannon extends Base_Object {
   shootBall(){
     this.ball = new Ball(this.ball_position[0], this.ball_position[1], this.ball_position[2]);
     this.ball.position.set(this.ball_position[0], this.ball_position[1], this.ball_position[2]);
-    this.ball.velocity.set(-0.5, 0, 0);
   }
 
   myType(){
@@ -171,7 +170,6 @@ class Ball extends Base_Object {
 		this.height = 8;
 		this.radius = 4;
     this.velocity.set( (2 * Math.random() ) - 1 , 0  , (2 * Math.random() )).normalize().multiplyScalar(0.5);
-    //this.aceleration.set(0, 0, 0);
     this.maxvel.set(1,1,1);
     this.minvel.set(-1,-1,-1);
     createBall(this, x, y, z);
@@ -192,15 +190,13 @@ class Ball extends Base_Object {
 
 	treatCollision(obj){
 		//Alien-Alien collision should make them go the opposite direction
-		if(obj.myType() == "Ball"){
-      var aux = this.velocity;
-      this.velocity = obj.velocity;
-      this.maxvel.set(0.2,0, 0.2);
-			obj.velocity= aux;
+		if(obj.myType() == "alien"){
+			this.velocity.multiplyScalar(-1);
+			obj.velocity.multiplyScalar(-1);
 		}
 		//Alien-Bullet collision should make both Bullet and Alien dissapear
-		if(obj.myType() == "Wall" && obj.mesh.material.color == 0xFF0000){
-      console.log("kapap");
+		if(obj.myType() == "bullet"){
+			objectsgroup.remove(obj);
 			objectsgroup.remove(this);
 		}
   }
@@ -238,10 +234,11 @@ function createBall(obj, x, y, z) {
 
 
   var kmaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00, wireframe: wires });
-  var kgeometry = new THREE.SphereGeometry(3.8, 16 ,12);
+  var kgeometry = new THREE.SphereGeometry(4, 16 ,12);
   var kmesh = new THREE.Mesh(kgeometry, kmaterial);
-
+  //mesh.position.set(x, y, z);
   obj.add(kmesh);
+  //addBall(ball,-20,5,-25);
 
 
   obj.position.x = x;
@@ -251,6 +248,15 @@ function createBall(obj, x, y, z) {
   grupo.add(obj);
 }
 
+
+
+/*function addBall(obj, x, y, z) {
+    'use strict';
+    geometry = new THREE.SphereGeometry(4, 16 ,12);
+    mesh = new THREE.Mesh(geometry, material);
+    mesh.position.set(x, y , z);
+    obj.add(mesh);
+}*/
 
 
 function createWall(table, x, y, z) {
@@ -264,10 +270,10 @@ function createWall(table, x, y, z) {
     addSideWall(table, 0, 5, 30);
     addBackWall(table, -29, 5, 0);
 
-    material = new THREE.MeshBasicMaterial({ color: 0xFF0000, wireframe: wires });
+    material = new THREE.MeshBasicMaterial({ color: 0xffe4b5, wireframe: wires });
     material.transparent = true;
     material.opacity =  0;
-    addBackWall(table, 40, 5, 0);
+    addBackWall(table, 29, 5, -30);
 
     table.position.x = x;
     table.position.y = y;
@@ -389,11 +395,11 @@ function rotate() {
     }
   }
   resultMatrix.fromArray(result);
-  //console.log(resultMatrix);
+  console.log(resultMatrix);
   meshes[0].matrix = resultMatrix;
 
   meshes[1].matrix.elements = resultb;
-  //console.log(meshes[0].matrix.elements);
+  console.log(meshes[0].matrix.elements);
 
 }
 
@@ -407,14 +413,15 @@ function createScene() {
 
 
     new Wall(0,0,0);
-    left_cannon = new Cannon(51, 1, 25, -Math.PI/16);
-    middle_cannon = new Cannon(51, 1, 0, 0);
-    right_cannon = new Cannon(51, 1, -25, Math.PI/16);
+    left_cannon = new Cannon(55, 1, 25, -Math.PI/16);
+    middle_cannon = new Cannon(55, 1, 0, 0);
+    right_cannon = new Cannon(55, 1, -25, Math.PI/16);
     selected_cannon = middle_cannon;
-    new Ball(-20,4,0);
-    new Ball(20,4,0);
-    new Ball(-15, 4, 5);
-    ball_camera = new Ball(15, 4, 5);
+    new Ball(-10,4,0);
+    new Ball(27,4,-5);
+    new Ball(27,4,20);
+    new Ball(-5, 4, -5);
+    ball_camera = new Ball(-7, 4, -7);
     scene.add(grupo);
 
 }
@@ -500,9 +507,18 @@ function onKeyDown(e) {
     case 37://left arrow
         selected_cannon.toggleLeftMovement();
         break
+    case 38://forward arrow
+        moveForward = true;
+        break;
     case 39://right arrow
         selected_cannon.toggleRightMovement();
         break
+    case 40://backwards arrow
+        moveBackwards = true;
+        break;
+    case 65: //a
+      ball3.translateZ(0.01);
+      break;
 
     case 69:  //E
           right_cannon.toggleSelectedCannon();
@@ -548,9 +564,9 @@ function checkMove() {
 	var i = 4;
   var l = grupo.children.length;
   //console.log(grupo.children);
-  //console.log(grupo.children);
+
 	while (i < l) {
-    
+    console.log(grupo.children[i]);
 		grupo.children[i].updatepos(delta); //aliens and bullet movement
 		i = i + 1;
 		l = grupo.children.length;
