@@ -11,42 +11,82 @@ var breakFB = false;
 var clock = new THREE.Clock();
 var scene, renderer;
 
+var wires = true;
+var grupo = new THREE.Group();
+var contador = 0;
 var geometry, material, mesh;
 var meshes = [];
-var merged_geo = new THREE.Geometry();
 
 var table, left_cannon, middle_cannon, right_cannon;
 var ball,ball1,ball2,ball3,bullet;
 var balls = [];
 var selected_cannon;
+var matrix_rotate;
+
+var ratio = 2.07;
+var scale = 0.013
+var scale_width;
+var scale_height;
+var last_width;
+var last_height;
+
+var clock = new THREE.Clock();
+var new_bulet_allowed = true;
+
+var ratio = 2.07;
+var scale = 0.013
+var scale_width;
+var scale_height;
+var last_width;
+var last_height;
+
+var new_bulet_allowed = true;
 
 class Base_Object extends THREE.Object3D{
   constructor(){
     super();
-    this.velocity = new THREE.Vector3();
+		this.velocity = new THREE.Vector3();
 		this.aceleration = new THREE.Vector3();
-		this.maxvelocity = new THREE.Vector3();
-		this.minvelocity = new THREE.Vector3();
-  }
-  updatepos(delta){
-    
-    var oldvel = new THREE.Vector3().copy(this.velocity);
-    var oldpos = new THREE.Vector3().copy(this.position);
-    
-    var nvel = (oldvel.addScaledVector(this.aceleration, delta)).clamp(this.minvelocity, this.maxvelocity);
-    var npos = oldpos.add(nvel);
-    
-    this.velocity.copy(nvel);
-		this.position.copy(npos);
+		this.maxvel = new THREE.Vector3();
+		this.minvel = new THREE.Vector3();
+		this.width = 0;
+		this.height = 0;
+		this.radius = 0;
+	}
 
-  }
-  toggleWireframe(wire) {
-    this.children[0].material.wireframe = wire;
-  }
+  updatepos(delta) {
+		var oldvel = new THREE.Vector3().copy(this.velocity);
+		var oldpos = new THREE.Vector3().copy(this.position);
+
+		// v = a * delta; limits velocity within a maximum and minimum value
+		var nvel = (oldvel.addScaledVector(this.aceleration, delta)).clamp(this.minvel, this.maxvel);
+		// x = x0 + v
+		var npos = oldpos.add(nvel);
+
+		/*Checks if object will hit a Wall/Limit before it happens and acts accordingly*/
+		if (npos.x - this.width/2 < -width/2) {
+			this.collideWallLR(npos, nvel, -1); // left wall (negative)
+		}
+		else if (npos.x + this.width/2 > width/2) {
+			this.collideWallLR(npos, nvel, 1); // right wall (positive)
+		}
+		else if (npos.y + this.height/2 > height/2) {
+			this.collideWallTB(npos, nvel, 1); // top wall (positive)
+		}
+		else if (npos.y - this.height/2 < -height/2) {
+			this.collideWallTB(npos, nvel, -1); // bottom wall (negative)
+		}
+
+		//proceeds movement after checking for potential wall hits
+		this.velocity.copy(nvel);
+		this.position.copy(npos);
+	}
 
   myType(){
     return "Object";
   }
+
+
 
 }
 
@@ -66,6 +106,15 @@ class Cannon extends Base_Object {
     super();
     createCannon(this, x, y, z, rotY);
     this.rotY = rotY;
+    if (rotY == 0){
+      this.ball_position = [55, 5, -30];
+    }
+    else if (rotY == Math.PI/16){
+      this.ball_position = [55, 5, -55];
+    }
+    else if (rotY == -Math.PI/16) {
+      this.ball_position = [55, 5, -5];
+    }
   }
 
   toggleSelectedCannon(){
@@ -94,6 +143,18 @@ class Cannon extends Base_Object {
       meshes[3].material.color.set(0x1E90FF);
     }
   }
+
+  toggleLeftMovement(){
+    selected_cannon.rotateX(0.05);
+  }
+  toggleRightMovement(){
+    selected_cannon.rotateX(-0.05);
+  }
+  shootBall(){
+    this.ball = new Ball(this.ball_position[0], this.ball_position[1], this.ball_position[2]);
+    this.ball.position.set(this.ball_position[0], this.ball_position[1], this.ball_position[2]);
+  }
+
   myType(){
     return "Cannon";
   }
@@ -102,30 +163,82 @@ class Cannon extends Base_Object {
 class Ball extends Base_Object {
   constructor(x, y, z){
     super();
-    
-    this.velocity.set(-1, 0,0);
-		this.maxvelocity.set(-1, 0, 0);
-    this.minvelocity.set(1, 0, 0);
-    createBall(x, y, z);
+    this.velocity = new THREE.Vector3();
+    this.velocity.set(1, 0,	 0);
+    createBall(this, x, y, z);
   }
 
+  update_position(ticks){
+    //var oldvelocity = new THREE.Vector3().copy(this.velocity);
+		var oldposition = new THREE.Vector3().copy(this.position);
+
+    //var newvelocity = (oldvelocity.addScaledVector(this.aceleration, delta));
+
+    var newposition = oldposition.add(this.velocity);
+
+    this.position.copy(newposition);
+
+  }
   myType(){
     return "Ball";
   }
 }
 
-class Bullet extends Base_Object{
+function createBall(obj, x, y, z) {
+  'use strict';
 
-  
+
+  var kmaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00, wireframe: wires });
+  var kgeometry = new THREE.SphereGeometry(4, 16 ,12);
+  var kmesh = new THREE.Mesh(kgeometry, kmaterial);
+  //mesh.position.set(x, y, z);
+  obj.add(kmesh);
+  //addBall(ball,-20,5,-25);
+
+
+  obj.position.x = x;
+  obj.position.y = y;
+  obj.position.z = z;
+  contador = contador +1;
+  grupo.add(obj);
 }
 
-function addBall(obj, x, y, z) {
+
+
+/*function addBall(obj, x, y, z) {
     'use strict';
     geometry = new THREE.SphereGeometry(4, 16 ,12);
     mesh = new THREE.Mesh(geometry, material);
     mesh.position.set(x, y , z);
     obj.add(mesh);
+}*/
+
+
+function createWall(x, y, z) {
+    'use strict';
+
+    table = new THREE.Object3D();
+
+    material = new THREE.MeshBasicMaterial({ color: 0x7FFFD4, wireframe: wires });
+    addGroundWall(table, 0, -1, -30);
+    //material = new THREE.MeshBasicMaterial({ color: 0x00ff00, wireframe: wires });
+    addSideWall(table, 0, 5, 0);
+    addSideWall(table, 0, 5, -60);
+    addBackWall(table, -29, 5, -30);
+
+    material = new THREE.MeshBasicMaterial({ color: 0xffe4b5, wireframe: wires });
+    material.transparent = true;
+    material.opacity =  0.5*Math.sin(new Date().getTime() * .0025);
+    addBackWall(table, 29, 5, -30);
+
+    table.position.x = x;
+    table.position.y = y;
+    table.position.z = z;
+    contador = contador +1;
+    grupo.add(table);
 }
+
+
 
 function addGroundWall(obj, x, y, z) {
   'use strict';
@@ -137,7 +250,7 @@ function addGroundWall(obj, x, y, z) {
 
 function addSideWall(obj, x, y, z) {
     'use strict';
-    geometry = new THREE.CubeGeometry(60, 10, 2);
+    geometry = new THREE.CubeGeometry(60, 15, 2);
     mesh = new THREE.Mesh(geometry, material);
     mesh.position.set(x, y, z);
     obj.add(mesh);
@@ -145,10 +258,32 @@ function addSideWall(obj, x, y, z) {
 
 function addBackWall(obj, x, y, z) {
     'use strict';
-    geometry = new THREE.CubeGeometry(2, 10, 60);
+    geometry = new THREE.CubeGeometry(2, 15, 60);
     mesh = new THREE.Mesh(geometry, material);
     mesh.position.set(x, y, z);
     obj.add(mesh);
+}
+
+
+function createCannon(index, x, y, z, rotY) {
+  'use strict';
+
+  material = new THREE.MeshBasicMaterial({ color: 0x1E90FF, wireframe: wires });
+  addCannonCylinder(index, 0, 10, 0);
+  addCannonArtic(index, 0, 0, 0);
+  if (rotY == 0){
+    meshes[2].material.color.set(0xff0000);
+    meshes[3].material.color.set(0xff0000);
+  }
+  contador = contador +1;
+
+  grupo.add(index);
+
+  index.rotation.z = Math.PI/2;
+  index.rotation.y = rotY;
+  index.position.x = x;
+  index.position.y = y;
+  index.position.z = z;
 }
 
 function addCannonCylinder(obj, x, y, z) {
@@ -157,18 +292,14 @@ function addCannonCylinder(obj, x, y, z) {
     geometry = new THREE.CylinderGeometry(4.5, 4.5, 20, 32, 0, true);
     mesh = new THREE.Mesh(geometry, material);
 
-    obj.add(mesh);
     mesh.position.set(x, y, z);
     meshes.push(mesh);
-    //meshes[0].updateMatrix();
-    //merged_geo.merge(meshes[0].geometry, meshes[0].matrix);
-    //obj.children.material.color.set(0xff0000);
+
     obj.add(mesh);
 }
 
 function addCannonArtic(obj, x, y, z){
 
-    material = new THREE.MeshBasicMaterial( { color: 0x1E90FF, wireframe: true } );
     geometry = new THREE.SphereBufferGeometry(4.5, 8, 6, 0, 2*Math.PI, Math.PI/2, 0.5 * Math.PI);
     material.side = THREE.DoubleSide;
     mesh = new THREE.Mesh(geometry, material);
@@ -183,64 +314,54 @@ function addCannonArtic(obj, x, y, z){
 }
 
 
-function createWall(x, y, z) {
-    'use strict';
 
-    table = new THREE.Object3D();
 
-    material = new THREE.MeshBasicMaterial({ color: 0xffe4b5, wireframe: true });
-    addGroundWall(table, 0, -1, -30);
-    material = new THREE.MeshBasicMaterial({ color: 0x00ff00, wireframe: true });
-    addSideWall(table, 0, 5, 0);
-    addSideWall(table, 0, 5, -60);
-    addBackWall(table, -29, 5, -30);
 
-    table.position.x = x;
-    table.position.y = y;
-    table.position.z = z;
-    scene.add(table);
+function create_matrixR(x) {
+  matrix_rotate = new Float32Array(16);
+
+  matrix_rotate[0] = Math.cos(x);
+  matrix_rotate[1] = -Math.sin(x);
+  matrix_rotate[2] = 0;
+  matrix_rotate[4] = Math.sin(x);
+  matrix_rotate[5] = Math.cos(x);
+  matrix_rotate[6] = 0;
+  matrix_rotate[8] = 0;
+  matrix_rotate[9] = 0;
+  matrix_rotate[10] = 1;
+
+
 }
-
-
-
-function createCannon(index, x, y, z, rotY) {
-    'use strict';
-
-    index = new THREE.Object3D();
-
-    material = new THREE.MeshBasicMaterial({ color: 0x1E90FF, wireframe: true });
-
-    //index.material.color.set(0xff0000);
-    addCannonCylinder(index, 0, 10, 0);
-    addCannonArtic(index, 0, 0, 0);
-    if (rotY == 0){
-      meshes[2].material.color.set(0xff0000);
-      meshes[3].material.color.set(0xff0000);
+function rotate() {
+  var result = new Float32Array(16);
+  var resultb = new Float32Array(16);
+  var resultMatrix = new THREE.Matrix4();
+  for (var i = 0; i < 3; i++) {
+    for (var j = 0; j < 3; j++) {
+      var sum = 0;
+      var sumb = 0;
+      for (var k = 0; k < 3; k++) {
+        if (undefined != meshes[0].matrix.elements){
+        sum += meshes[0].matrix.elements[4*i+k] * matrix_rotate[4*k+j];
+        sumb += meshes[1].matrix.elements[4*i+k] * matrix_rotate[4*k+j];
+        }
+      }
+      result[4*i+j] = sum;
+      resultb[4*i+j] = sumb;
     }
-    scene.add(index);
+  }
+  resultMatrix.fromArray(result);
+  console.log(resultMatrix);
+  meshes[0].matrix = resultMatrix;
 
-    index.rotation.z = Math.PI/2;
-    index.rotation.y = rotY;
-    index.position.x = x;
-    index.position.y = y;
-    index.position.z = z;
+  meshes[1].matrix.elements = resultb;
+  console.log(meshes[0].matrix.elements);
+
 }
-
-function createBall(x, y, z) {
-  'use strict';
-
-  ball = new THREE.Object3D();
-
-  material = new THREE.MeshBasicMaterial({ color: 0x00ff00, wireframe: true });
-  addBall(ball,-20,5,-25);
-  
-
-  ball.position.x = x;
-  ball.position.y = y;
-  ball.position.z = z;
-  scene.add(ball);
-}
-
+ function checkMove(){
+   var ticks = clock.getDelta();
+   selected_cannon.ball.update_position(ticks);
+ }
 
 function createScene() {
     'use strict';
@@ -254,8 +375,12 @@ function createScene() {
     left_cannon = new Cannon(55, 5, -5, -Math.PI/16);
     middle_cannon = new Cannon(55, 5, -30, 0);
     right_cannon = new Cannon(55, 5, -55, Math.PI/16);
-    ball1 = new Ball(-5, 0, -5);
-    
+    selected_cannon = middle_cannon;
+    new Ball(-10,0,0);
+    new Ball(27,0,-5);
+    new Ball(27,0,20);
+    new Ball(-5, 0, -5);
+    scene.add(grupo);
 
 }
 
@@ -263,23 +388,23 @@ function createScene() {
 function createCamera3() {
     'use strict';
 
-    camera1[2] = new THREE.OrthographicCamera( -70, 70, 40, -40, 1, 1000 );
+    camera1[2] = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, 100);
 
-
-    camera1[2].position.x = -2.5;
-    camera1[2].position.y = 0;
-    camera1[2].position.z = 0;
-    camera1[2].lookAt(scene.position);
+    camera1[2].position.x = -5;
+    camera1[2].position.y = 10;
+    camera1[2].position.z = -5;
+    middle_cannon.add(camera1[2]);
+    camera1[2].lookAt( new THREE.Vector3(0, 0, 0) );
 }
 //Camara lateral
 function createCamera2() {
     'use strict';
 
-    camera1[1] = new THREE.OrthographicCamera( -70, 70, 40, -40, 1, 1000 );
+    camera1[1] = new THREE.PerspectiveCamera( 45, 1920/1080, 1, 1000);
 
 
     camera1[1].position.x =0;
-    camera1[1].position.y = 0;
+    camera1[1].position.y = 40;
     camera1[1].position.z = 100;
     camera1[1].lookAt(scene.position);
 }
@@ -317,12 +442,15 @@ function onKeyDown(e) {
     'use strict';
 
     switch (e.keyCode) {
-    case 52: //4
-        scene.traverse(function (node) {
-            if (node instanceof THREE.Mesh) {
-                node.material.wireframe = !node.material.wireframe;
-            }
-        });
+      case 32: //Space
+        selected_cannon.shootBall();
+        break;
+      case 52: //4
+        wires = !wires;
+        //console.log(grupo.lenght);
+        for(var i = 0; i < contador; i++){
+          grupo.children[i].children[0].material.wireframe= wires;
+        }
         break;
     case 49: //1
         switch_camera(0);
@@ -345,7 +473,9 @@ function onKeyDown(e) {
         moveBackwards = true;
         break;
     case 65: //a
-    case 68: //d
+      ball3.translateZ(0.01);
+      break;
+
     case 69:  //E
           right_cannon.toggleSelectedCannon();
           break;
@@ -356,7 +486,7 @@ function onKeyDown(e) {
     case 87: //w
           middle_cannon.toggleSelectedCannon();
           break;
-    case 101: //e
+    case 68: //d
           scene.traverse(function (node) {
             if (node instanceof THREE.AxisHelper) {
               node.visible = !node.visible;
@@ -384,6 +514,25 @@ function onKeyUp(e) {
   }
 }
 
+
+/*function checkMove() {
+	var delta = clock.getDelta();
+
+	//Cannon.updatepos(delta);	//Cannon movement
+
+	var i = 0;
+	var l = objectsgroup.children.length;
+
+	while (i < l) {
+		objectsgroup.children[i].updatepos(delta); //aliens and bullet movement
+		i = i + 1;
+		l = objectsgroup.children.length;
+	}
+
+	//Checks for collisions of certain objects
+	handleCollisions();
+}*/
+
 function render() {
 	renderer.render(scene, camera1[active_camera]);
 }
@@ -392,20 +541,12 @@ function render() {
 
 function animate() {
   //Renders Scene
-  var delta = clock.getDelta();
-  var i = 0;
-	var l = balls.length;
-   
+  //checkMove();
 
-  while (i < l) {
-    
-    balls[i].updatepos(delta); 
-		i = i + 1;
-		l = balls.length;
-  }
   render();
 
-	requestAnimationFrame(animate);
+  requestAnimationFrame(animate);
+
 }
 
 function init() {
