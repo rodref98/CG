@@ -29,11 +29,8 @@ var last_height;
 var clock = new THREE.Clock();
 var new_bulet_allowed = true;
 
-<<<<<<< HEAD
-=======
 
-var new_bulet_allowed = true;
->>>>>>> b794a7a904e489c16ae1ed40346dd5089e80db67
+
 
 class Base_Object extends THREE.Object3D{
   constructor(){
