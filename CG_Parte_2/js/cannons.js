@@ -11,7 +11,7 @@ var grupo = new THREE.Group();
 var contador = 0;
 var geometry, material, mesh;
 var meshes = [];
-
+var Axis = true;
 var table, left_cannon, middle_cannon, right_cannon, ball_camera;
 var selected_cannon;
 var matrix_rotate;
@@ -174,6 +174,7 @@ class Ball extends Base_Object {
     //this.aceleration.set(0, 0, 0);
     this.maxvel.set(1,1,1);
     this.minvel.set(-1,-1,-1);
+    this.add(new THREE.AxisHelper(7));
     createBall(this, x, y, z);
   }
 
@@ -531,7 +532,8 @@ function onKeyDown(e) {
     case 81: //Q
           left_cannon.toggleSelectedCannon();
           break;
-    case 83: //s
+    case 82: //r
+
     case 87: //w
           middle_cannon.toggleSelectedCannon();
           break;
