@@ -210,7 +210,7 @@ class Ball extends Base_Object {
       this.maxvel.set(0.02,0, 0.02);
 			obj.velocity= aux;
 		}
-		//Ball-FinalWall collision should make both Bullet and Alien dissapear
+		//Ball-FinalWall collision should make balls dissapear
 		if(obj.myType() == "Wall" && obj.mesh.material.color == 0xFF0000){
       //console.log("kapap");
 			objectsgroup.remove(this);
@@ -403,7 +403,7 @@ function createScene() {
 
     scene = new THREE.Scene();
 
-    scene.add(new THREE.AxisHelper(100));
+    //scene.add(new THREE.AxisHelper(100));
 
 
     new Wall(0,0,0);
@@ -529,13 +529,6 @@ function onKeyDown(e) {
     case 87: //w
           middle_cannon.toggleSelectedCannon();
           break;
-    case 68: //d
-          scene.traverse(function (node) {
-            if (node instanceof THREE.AxisHelper) {
-              node.visible = !node.visible;
-            }
-          });
-          break;
 
     }
 }
@@ -566,7 +559,7 @@ function checkMove() {
   //console.log(grupo.children);
 	while (i < l) {
     
-		grupo.children[i].updatepos(delta); //aliens and bullet movement
+		grupo.children[i].updatepos(delta); //Balls movement
 		i = i + 1;
 		l = grupo.children.length;
 	}
