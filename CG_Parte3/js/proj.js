@@ -69,6 +69,16 @@ function addBackWall(obj, x, y, z) {
     obj.add(mesh);
 }
 
+function addPedestal(obj, x, y, z) {
+    'use strict';
+    material = new THREE.MeshBasicMaterial({ color: 0xA9A9A9, wireframe: wires });
+    geometry = new THREE.CubeGeometry(3, 20, 3);
+    mesh = new THREE.Mesh(geometry, material);
+    mesh.position.set(x, y, z);
+    obj.add(mesh);
+}
+
+
 function createWall(table, x, y, z) {
     'use strict';
 
@@ -76,6 +86,7 @@ function createWall(table, x, y, z) {
     material = new THREE.MeshBasicMaterial({ color: 0x7FFFD4, wireframe: wires });
     addGroundWall(table, 0, 0, 0);
     addBackWall(table, 0, 20, -29);
+    addPedestal(table, 0, 11, 0);
 
     table.position.x = x;
     table.position.y = y;
@@ -99,18 +110,6 @@ function createScene() {
 
 }
 
-//Camara lateral
-function createCamera2() {
-    'use strict';
-
-    camera1[1] = new THREE.PerspectiveCamera( 45, 1920/1080, 1, 1000);
-
-
-    camera1[1].position.x =0;
-    camera1[1].position.y = 40;
-    camera1[1].position.z = 100;
-    camera1[1].lookAt(scene.position);
-}
 
 function createCamera() {
     'use strict';
@@ -124,6 +123,18 @@ function createCamera() {
     camera1[0].lookAt(scene.position);
 }
 
+//Camara lateral
+function createCamera2() {
+  'use strict';
+
+  camera1[1] = new THREE.PerspectiveCamera( 45, 1920/1080, 1, 1000);
+
+
+  camera1[1].position.x =0;
+  camera1[1].position.y = 40;
+  camera1[1].position.z = 100;
+  camera1[1].lookAt(scene.position);
+}
 function switch_camera(number) {
 	active_camera = number;
 }
@@ -151,7 +162,9 @@ function onKeyDown(e) {
         wires = !wires;
         //console.log(grupo.lenght);
         for(var i = 0; i < grupo.children.length; i++){
-          grupo.children[i].children[0].material.wireframe= wires;
+          for (var j = 0; j < grupo.children[i].children.length; j++){
+            grupo.children[i].children[j].material.wireframe= wires;
+          }
         }
         break;
     case 49: //1
@@ -163,9 +176,6 @@ function onKeyDown(e) {
         break;
 
     case 51: //3
-        switch_camera(2);
-        break;
-
     case 37://left arrow
         selected_cannon.toggleLeftMovement();
         break
