@@ -1,0 +1,1 @@
+/*global THREE, requestAnimationFrame, console*/
