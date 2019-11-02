@@ -11,32 +11,29 @@ var grupo = new THREE.Group();
 var contador = 0;
 var geometry, material, mesh;
 var meshes = [];
-var Axis = true;
+var Axiscont = 0;
+var Axisvec = [];
+var Axistf = true;
 var table, left_cannon, middle_cannon, right_cannon, ball_camera;
 var selected_cannon;
 var matrix_rotate;
 
-var width = 60;
-var height = 62;
+var x_limit = 60;
+var z_limit = 62;
 var ratio = 2.07;
 var scale = 0.013
-var scale_width;
-var scale_height;
-var last_width;
-var last_height;
 
 var clock = new THREE.Clock();
-var new_bulet_allowed = true;
 
 class Base_Object extends THREE.Object3D{
   constructor(){
     super();
 		this.velocity = new THREE.Vector3();
 		this.aceleration = new THREE.Vector3();
-		this.maxvel = new THREE.Vector3();
-		this.minvel = new THREE.Vector3();
-		this.width = 0;
-		this.height = 0;
+		this.maxvelocity = new THREE.Vector3();
+		this.minvelocity = new THREE.Vector3();
+		this.x_limit = 0;
+		this.z_limit = 0;
 		this.radius = 0;
 	}
 
@@ -45,22 +42,22 @@ class Base_Object extends THREE.Object3D{
 		var oldpos = new THREE.Vector3().copy(this.position);
 
 		// v = a * delta; limits velocity within a maximum and minimum value
-		var nvel = (oldvel.addScaledVector(this.aceleration , delta)).clamp(this.minvel, this.maxvel);
+		var nvel = (oldvel.addScaledVector(this.aceleration , delta)).clamp(this.minvelocity, this.maxvelocity);
 		// x = x0 + v
 		var npos = oldpos.add(nvel);
 
 		/*Checks if object will hit a Wall/Limit before it happens and acts accordingly*/
-		if (npos.x - this.width/2 < -width/2) {
-			this.collideWallLR(npos, nvel, -1); // left wall (negative)
+		if (npos.x - this.x_limit/2 < -x_limit/2) {
+			this.collideBackWall(npos, nvel, -1); // left wall (negative)
 		}
-		else if (npos.x + this.width/2 > (width+20)/2) {
+		else if (npos.x + this.x_limit/2 > (x_limit+20)/2) {
 			grupo.remove(this); // right wall (positive)
 		}
-		else if (npos.z + this.height/2 > height/2) {
-			this.collideWallTB(npos, nvel, 1); // top wall (positive)
+		else if (npos.z + this.z_limit/2 > z_limit/2) {
+			this.collideSideWall(npos, nvel, 1); // top wall (positive)
 		}
-		else if (npos.z - this.height/2 < -height/2) {
-			this.collideWallTB(npos, nvel, -1); // bottom wall (negative)
+		else if (npos.z - this.z_limit/2 < -z_limit/2) {
+			this.collideSideWall(npos, nvel, -1); // bottom wall (negative)
     }
 
 
@@ -103,6 +100,8 @@ class Cannon extends Base_Object {
     super();
     createCannon(this, x, y, z, rotY);
     this.rotY = rotY;
+    this.velocitysetX = -0.5;
+    this.velocitysetZ = 0;
     if (this.rotY == 0){
       this.ball_position = [32, 4, 0];
     }
@@ -146,14 +145,20 @@ class Cannon extends Base_Object {
 
   toggleLeftMovement(){
     selected_cannon.rotateX(0.05);
+    this.velocitysetX -= 0.03;
+    this.velocitysetZ += 0.03;
+    this.ball_position[2] -= -1;
   }
   toggleRightMovement(){
     selected_cannon.rotateX(-0.05);
+    this.velocitysetX += 0.03;
+    this.velocitysetZ -= 0.03;
+    this.ball_position[2] += -1;
   }
   shootBall(){
     this.ball = new Ball(this.ball_position[0], this.ball_position[1], this.ball_position[2]);
     this.ball.position.set(this.ball_position[0], this.ball_position[1], this.ball_position[2]);
-    this.ball.velocity.set(-0.5, 0, 0);
+    this.ball.velocity.set(this.velocitysetX, 0, this.velocitysetZ);
   }
 
   myType(){
@@ -164,41 +169,50 @@ class Cannon extends Base_Object {
 class Ball extends Base_Object {
   constructor(x, y, z){
     super();
-    this.width = 8;
-		this.height = 8;
+    this.x_limit = 8;
+		this.z_limit = 8;
 		this.radius = 4;
     this.velocity.set( (2 * Math.random() ) - 1 , 0  , (2 * Math.random() )-1).normalize().multiplyScalar(0.5);
-    this.aceleration.set(0, 0, 0);
-    this.maxvel.set(1,1,1);
-    this.minvel.set(-1,-1,-1);
-    this.add(new THREE.AxisHelper(7));
+    //this.aceleration.set(0, 0, 0);
+    this.maxvelocity.set(1,1,1);
+    this.minvelocity.set(-1,-1,-1);
+    this.index = Axiscont;
+    Axisvec[this.index] = new THREE.AxisHelper(7);
+    Axiscont ++;
+    this.add(Axisvec[this.index]);
     createBall(this, x, y, z);
   }
 
 
-  collideWallLR(npos, nvel, side) { // side = -1 -> left / side = 1 -> right
-		npos.setX( (width/2 - this.width/2) * side);
+  collideBackWall(npos, nvel, side) { // side = -1 -> left / side = 1 -> right
+		npos.setX( (x_limit/2 - this.x_limit/2) * side);
 		nvel.setX(nvel.x * -1);
 		return npos, nvel;
 	}
 
-	collideWallTB(npos, nvel, side) { // side = -1 -> bottom / side = 1 -> top
-		npos.setZ( (height/2 - this.height/2) * side);
+	collideSideWall(npos, nvel, side) { // side = -1 -> bottom / side = 1 -> top
+		npos.setZ( (z_limit/2 - this.z_limit/2) * side);
 		nvel.setZ(nvel.z * -1);
 		return npos, nvel;
-	}
+  }
+  toggleoffAxisHelper(){
+    this.remove(Axisvec[this.index]);
+  }
+  toggleonAxisHelper(){
+    this.add(Axisvec[this.index]);
+  }
 
 	treatCollision(obj){
-		
+		//Ball-Ball collision should make them go the opposite direction
 		if(obj.myType() == "Ball"){
       var aux = this.velocity;
       this.velocity = obj.velocity;
-      //this.maxvel.set(0.02,0, 0.02);
+      this.maxvelocity.set(0.02,0, 0.02);
 			obj.velocity= aux;
 		}
-		
+		//Ball-FinalWall collision should make Ball dissapear
 		if(obj.myType() == "Wall" && obj.mesh.material.color == 0xFF0000){
-      console.log("kapap");
+      //console.log("kapap");
 			objectsgroup.remove(this);
 		}
   }
@@ -208,18 +222,6 @@ class Ball extends Base_Object {
 
 }
 
-
- /* update_position(ticks){
-    //var oldvelocity = new THREE.Vector3().copy(this.velocity);
-		var oldposition = new THREE.Vector3().copy(this.position);
-
-    //var newvelocity = (oldvelocity.addScaledVector(this.aceleration, delta));
-
-    var newposition = oldposition.add(this.velocity);
-
-    this.position.copy(newposition);
-
-  }*/
 
 
   /*Iterates through group in search for collisions*/
@@ -234,11 +236,11 @@ function handleCollisions() {
 function createBall(obj, x, y, z) {
   'use strict';
 
-
   var kmaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00, wireframe: wires });
   var kgeometry = new THREE.SphereGeometry(3.8, 16 ,12);
   var kmesh = new THREE.Mesh(kgeometry, kmaterial);
 
+  //obj.add(new THREE.AxisHelper(7));
   obj.add(kmesh);
 
 
@@ -356,15 +358,28 @@ function addCannonArtic(obj, x, y, z){
 function create_matrixR(x) {
   matrix_rotate = new Float32Array(16);
 
-  matrix_rotate[0] = Math.cos(x);
-  matrix_rotate[1] = -Math.sin(x);
+  matrix_rotate[0] = 1;
+  matrix_rotate[1] = 0;
   matrix_rotate[2] = 0;
-  matrix_rotate[4] = Math.sin(x);
+  matrix_rotate[3] = 0;
+
+  matrix_rotate[4] = 0;
   matrix_rotate[5] = Math.cos(x);
-  matrix_rotate[6] = 0;
+  matrix_rotate[6] = -Math.sin(x);
+  matrix_rotate[7] = 0;
+
   matrix_rotate[8] = 0;
-  matrix_rotate[9] = 0;
-  matrix_rotate[10] = 1;
+  matrix_rotate[9] = Math.sin(x);
+  matrix_rotate[10] = Math.cos(x);
+  matrix_rotate[11] = 0;
+
+  matrix_rotate[12] = 0;
+  matrix_rotate[13] = 0;
+  matrix_rotate[14] = 0;
+  matrix_rotate[15] = 1;
+
+
+
 
 
 }
@@ -372,11 +387,16 @@ function rotate() {
   var result = new Float32Array(16);
   var resultb = new Float32Array(16);
   var resultMatrix = new THREE.Matrix4();
-  for (var i = 0; i < 3; i++) {
-    for (var j = 0; j < 3; j++) {
+  var resultMatrixb = new THREE.Matrix4();
+  var q1 = new THREE.Quaternion();
+  var v1 = new THREE.Vector3(0, 1, 0);
+
+
+  for (var i = 0; i < 4; i++) {
+    for (var j = 0; j < 4; j++) {
       var sum = 0;
       var sumb = 0;
-      for (var k = 0; k < 3; k++) {
+      for (var k = 0; k < 4; k++) {
         if (undefined != meshes[0].matrix.elements){
         sum += meshes[0].matrix.elements[4*i+k] * matrix_rotate[4*k+j];
         sumb += meshes[1].matrix.elements[4*i+k] * matrix_rotate[4*k+j];
@@ -386,11 +406,22 @@ function rotate() {
       resultb[4*i+j] = sumb;
     }
   }
-  resultMatrix.fromArray(result);
-  //console.log(resultMatrix);
-  meshes[0].matrix = resultMatrix;
-
-  meshes[1].matrix.elements = resultb;
+  resultMatrix.set(result[0], result[1], result[2], result[3],
+                  result[4], result[5], result[6], result[7],
+                  result[8], result[9], result[10], result[11],
+                  result[12], result[13], result[14], result[15]);
+  console.log(resultMatrix);
+  /*meshes[0].matrix.set(result[0], result[1], result[2], result[3],
+                  result[4], result[5], result[6], result[7],
+                  result[8], result[9], result[10], result[11],
+                  result[12], result[13], result[14], result[15]);*/
+  q1.setFromAxisAngle(v1, Math.PI/2);
+  middle_cannon.quaternion.multiply(q1);
+  selected_cannon.matrix.multiply(resultMatrix);
+  console.log(selected_cannon.matrix)
+  //middle_cannon.matrix.rotateByAxis(v1, Math.PI/16);
+  meshes[1].matrix = resultMatrixb;
+  //console.log(meshes[0].matrix);
   //console.log(meshes[0].matrix.elements);
 
 }
@@ -405,14 +436,16 @@ function createScene() {
 
 
     new Wall(0,0,0);
-    left_cannon = new Cannon(51, 1, 25, -Math.PI/16);
-    middle_cannon = new Cannon(51, 1, 0, 0);
-    right_cannon = new Cannon(51, 1, -25, Math.PI/16);
+    left_cannon = new Cannon(51, 4, 25, -Math.PI/16);
+    middle_cannon = new Cannon(51, 4, 0, 0);
+    right_cannon = new Cannon(51, 4, -25, Math.PI/16);
     selected_cannon = middle_cannon;
     new Ball(-20,4,0);
     new Ball(20,4,0);
     new Ball(-15, 4, 15);
     ball_camera = new Ball(15, 4, 15);
+    //create_matrixR(Math.PI/16);
+    //rotate();
     scene.add(grupo);
 
 }
@@ -509,18 +542,24 @@ function onKeyDown(e) {
           left_cannon.toggleSelectedCannon();
           break;
     case 82: //r
-
+        if(Axistf){
+          for(var i = 4; i < grupo.children.length; i++){
+            console.log(grupo.children[i]);
+            grupo.children[i].toggleoffAxisHelper();
+          }
+          Axistf = false;
+        }
+        else{
+          for(var i = 4; i < grupo.children.length; i++){
+            //console.log(grupo.children[i]);
+            grupo.children[i].toggleonAxisHelper();
+          }
+          Axistf = true;
+        }
+        break;
     case 87: //w
           middle_cannon.toggleSelectedCannon();
           break;
-    case 68: //d
-          scene.traverse(function (node) {
-            if (node instanceof THREE.AxisHelper) {
-              node.visible = !node.visible;
-            }
-          });
-          break;
-
     }
 }
 
@@ -549,8 +588,8 @@ function checkMove() {
   //console.log(grupo.children);
   //console.log(grupo.children);
 	while (i < l) {
-    
-		grupo.children[i].updatepos(delta); 
+
+		grupo.children[i].updatepos(delta); //Balls movement
 		i = i + 1;
 		l = grupo.children.length;
 	}
