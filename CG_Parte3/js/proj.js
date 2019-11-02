@@ -7,13 +7,40 @@ var active_camera = 0;
 var scene, renderer;
 var wires = true;
 var geometry, material, mesh;
+var grupo = new THREE.Group();
+var table;
 
-class Triangle extends THREE.Object3D {
+
+class Base_Object extends THREE.Object3D{
+  constructor(){
+    super();
+	}
+
+  myType(){
+    return "Object";
+  }
+
+
+
+}
+
+class Wall extends Base_Object {
+  constructor(x, y, z){
+    super();
+    createWall(this, x, y, z);
+  }
+
+  myType(){
+    return "Wall";
+  }
+}
+
+class Triangle extends Base_Object {
     constructor(x, y, z){
       super();
       createTriangle(this, x, y, z);
     }
-  
+
     myType(){
       return "Triangle";
     }
@@ -22,10 +49,39 @@ class Triangle extends THREE.Object3D {
 function createTriangle(obj,x,y,z){
 
     material = new THREE.MeshBasicMaterial({ color: 0x7FFFD4, wireframe: wires });
-    
+
 }
 
 
+function addGroundWall(obj, x, y, z) {
+  'use strict';
+  geometry = new THREE.CubeGeometry(60, 0, 62);
+  mesh = new THREE.Mesh(geometry, material);
+  mesh.position.set(x, y, z);
+  obj.add(mesh);
+}
+
+function addBackWall(obj, x, y, z) {
+    'use strict';
+    geometry = new THREE.CubeGeometry(60, 40, 2);
+    mesh = new THREE.Mesh(geometry, material);
+    mesh.position.set(x, y, z);
+    obj.add(mesh);
+}
+
+function createWall(table, x, y, z) {
+    'use strict';
+
+
+    material = new THREE.MeshBasicMaterial({ color: 0x7FFFD4, wireframe: wires });
+    addGroundWall(table, 0, 0, 0);
+    addBackWall(table, 0, 20, -29);
+
+    table.position.x = x;
+    table.position.y = y;
+    table.position.z = z;
+    grupo.add(table);
+}
 
 
 
@@ -37,7 +93,9 @@ function createScene() {
 
     scene.add(new THREE.AxisHelper(100));
 
+    new Wall(0,0,0);
 
+    scene.add(grupo);
 
 }
 
@@ -153,7 +211,7 @@ function onKeyUp(e) {
         moveBackwards = false;
         breakFB = true;
         break;
-  
+
     }
   }
 
