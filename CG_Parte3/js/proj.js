@@ -117,6 +117,16 @@ function createWall(table, x, y, z) {
     grupo.add(table);
 }
 
+function addHolofoteArtic(obj, x, y, z){
+
+    geometry = new THREE.SphereBufferGeometry(3.9, 8, 6, 0, 2*Math.PI, -Math.PI/2, 0.5 * Math.PI);
+    material.side = THREE.DoubleSide;
+    mesh = new THREE.Mesh(geometry, material);
+    mesh.position.set(x, y, z);
+    obj.add(mesh);
+
+}
+
 function addHolofoteCone(obj, x, y, z) {
     'use strict';
 
@@ -134,6 +144,7 @@ function createHolofote(index, x, y, z) {
 
     material = new THREE.MeshBasicMaterial({ color: 0x1E90FF, wireframe: wires });
     addHolofoteCone(index, 0, 10, 0);
+    addHolofoteArtic(index, 0, 14, 0);
 
     index.rotation.z = Math.PI/2;
     index.rotation.y = -Math.PI/2;
