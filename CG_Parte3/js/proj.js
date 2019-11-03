@@ -35,6 +35,18 @@ class Wall extends Base_Object {
   }
 }
 
+class Holofote extends Base_Object {
+  constructor(x, y, z){
+    super();
+    createHolofote(this, x, y, z);
+  }
+
+  myType(){
+    return "Holofote";
+  }
+
+}
+
 class Triangle extends Base_Object {
     constructor(x, y, z){
       super();
@@ -81,6 +93,16 @@ function addBackWall(obj, x, y, z) {
     obj.add(mesh);
 }
 
+function addPedestal(obj, x, y, z) {
+    'use strict';
+    material = new THREE.MeshBasicMaterial({ color: 0xA9A9A9, wireframe: wires });
+    geometry = new THREE.CubeGeometry(3, 20, 3);
+    mesh = new THREE.Mesh(geometry, material);
+    mesh.position.set(x, y, z);
+    obj.add(mesh);
+}
+
+
 function createWall(table, x, y, z) {
     'use strict';
 
@@ -88,6 +110,7 @@ function createWall(table, x, y, z) {
     material = new THREE.MeshBasicMaterial({ color: 0x7FFFD4, wireframe: wires });
     addGroundWall(table, 0, 0, 0);
     addBackWall(table, 0, 20, -29);
+    addPedestal(table, 0, 10, 0);
 
     table.position.x = x;
     table.position.y = y;
@@ -95,6 +118,42 @@ function createWall(table, x, y, z) {
     grupo.add(table);
 }
 
+function addHolofoteArtic(obj, x, y, z){
+
+    geometry = new THREE.SphereBufferGeometry(3.9, 8, 6, 0, 2*Math.PI, -Math.PI/2, 0.5 * Math.PI);
+    material.side = THREE.DoubleSide;
+    mesh = new THREE.Mesh(geometry, material);
+    mesh.position.set(x, y, z);
+    obj.add(mesh);
+
+}
+
+function addHolofoteCone(obj, x, y, z) {
+    'use strict';
+
+    geometry = new THREE.CylinderGeometry(4, 0, 10, 22, 0, true);
+    mesh = new THREE.Mesh(geometry, material);
+
+    mesh.position.set(x, y, z);
+
+    obj.add(mesh);
+}
+
+function createHolofote(index, x, y, z) {
+    'use strict';
+
+
+    material = new THREE.MeshBasicMaterial({ color: 0x1E90FF, wireframe: wires });
+    addHolofoteCone(index, 0, 10, 0);
+    addHolofoteArtic(index, 0, 14, 0);
+
+    index.rotation.z = Math.PI/2;
+    index.rotation.y = -Math.PI/2;
+    index.position.x = x;
+    index.position.y = y;
+    index.position.z = z;
+    grupo.add(index);
+}
 
 
 
@@ -107,23 +166,15 @@ function createScene() {
 
     new Triangle(20,0,20);
     new Wall(0,0,0);
+    new Holofote(-25, 25, 30);
+    new Holofote(-10, 25, 30);
+    new Holofote(5, 25, 30);
+    new Holofote(20, 25, 30);
 
     scene.add(grupo);
 
 }
 
-//Camara lateral
-function createCamera2() {
-    'use strict';
-
-    camera1[1] = new THREE.PerspectiveCamera( 45, 1920/1080, 1, 1000);
-
-
-    camera1[1].position.x =0;
-    camera1[1].position.y = 40;
-    camera1[1].position.z = 100;
-    camera1[1].lookAt(scene.position);
-}
 
 function createCamera() {
     'use strict';
@@ -137,6 +188,18 @@ function createCamera() {
     camera1[0].lookAt(scene.position);
 }
 
+//Camara lateral
+function createCamera2() {
+  'use strict';
+
+  camera1[1] = new THREE.PerspectiveCamera( 45, 1920/1080, 1, 1000);
+
+
+  camera1[1].position.x = 40;
+  camera1[1].position.y = 40;
+  camera1[1].position.z = 100;
+  camera1[1].lookAt(scene.position);
+}
 function switch_camera(number) {
 	active_camera = number;
 }
@@ -164,7 +227,9 @@ function onKeyDown(e) {
         wires = !wires;
         //console.log(grupo.lenght);
         for(var i = 0; i < grupo.children.length; i++){
-          grupo.children[i].children[0].material.wireframe= wires;
+          for (var j = 0; j < grupo.children[i].children.length; j++){
+            grupo.children[i].children[j].material.wireframe= wires;
+          }
         }
         break;
     case 49: //1
@@ -174,11 +239,6 @@ function onKeyDown(e) {
     case 50: //2
         switch_camera(1);
         break;
-
-    case 51: //3
-        switch_camera(2);
-        break;
-
     case 37://left arrow
         selected_cannon.toggleLeftMovement();
         break
