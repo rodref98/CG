@@ -50,8 +50,8 @@ function createTriangle(obj,x,y,z){
     geometry = new THREE.Geometry();
     material = new THREE.MeshBasicMaterial({ color: 0xFFFFFF, wireframe: wires });
     var v1 = new THREE.Vector3(0, 0, 0);
-    var v2 = new THREE.Vector3(30, 0, 0);
-    var v3 = new THREE.Vector3(27, 30, 0);
+    var v2 = new THREE.Vector3(0, 0, -30);
+    var v3 = new THREE.Vector3(0, 30, -30);
     var triangle = new THREE.Triangle(v1, v2, v3);
     var normal = triangle.normal();
     geometry.vertices.push(triangle.a);
@@ -59,6 +59,7 @@ function createTriangle(obj,x,y,z){
     geometry.vertices.push(triangle.c);
     geometry.faces.push(new THREE.Face3(0, 1, 2, normal));
     mesh = new THREE.Mesh(geometry, material);
+    mesh.position.set(x,y,z);
     scene.add(mesh);
 
 }
@@ -104,7 +105,7 @@ function createScene() {
 
     scene.add(new THREE.AxisHelper(100));
 
-    new Triangle(5,5,5);
+    new Triangle(20,0,20);
     new Wall(0,0,0);
 
     scene.add(grupo);
