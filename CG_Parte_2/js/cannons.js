@@ -226,7 +226,7 @@ class Ball extends Base_Object {
 
 
 
-  /*Iterates through objectsgroup in search for collisions*/
+  /*Iterates through group in search for collisions*/
 function handleCollisions() {
 	for(var i = 4; i < grupo.children.length-1; i++){
 		//j = i + 1 -> important to avoid unecessary checks
