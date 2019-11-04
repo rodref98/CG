@@ -58,6 +58,16 @@ class Triangle extends Base_Object {
     }
   }
 
+class Painting extends Base_Object{
+    constructor(x, y, z){
+        super();
+        createPainting(this, x, y, z);
+    }
+    myType(){
+        return "Painting";
+    }
+}
+
 function createTriangle(obj,x,y,z){
     geometry = new THREE.Geometry();
     material = new THREE.MeshBasicMaterial({ color: 0xFFFFFF, wireframe: wires });
@@ -79,7 +89,7 @@ function createTriangle(obj,x,y,z){
 
 function addGroundWall(obj, x, y, z) {
   'use strict';
-  geometry = new THREE.CubeGeometry(60, 0, 62);
+  geometry = new THREE.CubeGeometry(80, 0, 80);
   mesh = new THREE.Mesh(geometry, material);
   mesh.position.set(x, y, z);
   obj.add(mesh);
@@ -87,13 +97,13 @@ function addGroundWall(obj, x, y, z) {
 
 function addBackWall(obj, x, y, z) {
     'use strict';
-    geometry = new THREE.CubeGeometry(60, 40, 2);
+    geometry = new THREE.CubeGeometry(80, 60, 2);
     mesh = new THREE.Mesh(geometry, material);
     mesh.position.set(x, y, z);
     obj.add(mesh);
 }
 
-function addPedestal(obj, x, y, z) {
+function addPedestalLeg(obj, x, y, z) {
     'use strict';
     material = new THREE.MeshBasicMaterial({ color: 0xA9A9A9, wireframe: wires });
     geometry = new THREE.CubeGeometry(3, 20, 3);
@@ -102,16 +112,25 @@ function addPedestal(obj, x, y, z) {
     obj.add(mesh);
 }
 
+function addPedestalTop(obj,x,y,z){
+    'use strict';
+    material = new THREE.MeshBasicMaterial({ color: 0xA9A9A9, wireframe: wires });
+    geometry = new THREE.CubeGeometry(12, 1, 12);
+    mesh = new THREE.Mesh(geometry, material);
+    mesh.position.set(x, y, z);
+    obj.add(mesh);
+   
+}
 
 function createWall(table, x, y, z) {
     'use strict';
 
 
-    material = new THREE.MeshBasicMaterial({ color: 0x7FFFD4, wireframe: wires });
-    addGroundWall(table, 0, 0, 0);
-    addBackWall(table, 0, 20, -29);
-    addPedestal(table, 0, 10, 0);
-
+    material = new THREE.MeshBasicMaterial({ color: 0xFFFFFF, wireframe: wires });
+    addGroundWall(table, 0, 0, 40);
+    addBackWall(table, 0, 30, 1);
+    addPedestalLeg(table, 0, 10, 45);
+    addPedestalTop(table, 0, 20, 45);
     table.position.x = x;
     table.position.y = y;
     table.position.z = z;
@@ -155,6 +174,11 @@ function createHolofote(index, x, y, z) {
     grupo.add(index);
 }
 
+function createPainting(obj,x,y,z){
+    'use strict';
+
+    addSquares(obj);
+}
 
 
 function createScene() {
