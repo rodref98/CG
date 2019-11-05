@@ -8,7 +8,7 @@ var scene, renderer;
 var wires = true;
 var geometry, material, mesh;
 var grupo = new THREE.Group();
-var table;
+var obj;
 var directional_light;
 var holofote2;
 var material_array;
@@ -28,6 +28,87 @@ class Base_Object extends THREE.Object3D{
   }
 
 }
+
+class Painting extends Base_Object{
+  constructor(x,y,z){
+    super();
+    createPainting(this, x, y, z);
+  }
+  myType(){
+    return "Painting";
+  }
+}
+
+function createPainting(obj,x,y,z){
+  'use strict';
+  var auxx = -24;
+  var auxy = 42;
+  var auxz = 3;
+  addFrame(obj, x, y, z);
+  addBackground(obj, x, y ,z);
+  for(var j = 0; j < 9; j ++){
+    auxy = 42;
+    if(j != 0) auxx += 6;
+    for(var i = 0; i < 5; i++){
+      addCubes(obj, auxx, auxy, auxz);
+      auxy = auxy - 6;
+    }
+  }
+  auxx = -27;
+  auxy = 45;
+  auxz = 5;
+  for(var j = 0; j < 10; j ++){
+    auxy = 45;
+    if(j != 0) auxx += 6;
+    for(var i = 0; i < 6; i++){
+      addCylinders(obj, auxx, auxy, auxz);
+      auxy = auxy - 6;
+    }
+  }
+  grupo.add(obj);
+}
+
+function addFrame(obj,x,y,z){
+  'use strict';
+
+    geometry = new THREE.CubeGeometry(64, 40, 2);
+    material = new THREE.MeshBasicMaterial({ color: 0xB8860B, wireframe : wires});
+    mesh = new THREE.Mesh(geometry, material);
+    mesh.position.set(x, y, z);
+    obj.add(mesh);
+
+}
+
+function addBackground(obj,x,y,z){
+  'use strict';
+    geometry = new THREE.CubeGeometry(56, 32, 2.5);
+    material = new THREE.MeshBasicMaterial({ color: 0xA9A9A9, wireframe : wires});
+    mesh = new THREE.Mesh(geometry, material);
+    mesh.position.set(x, y, z);
+    obj.add(mesh);
+
+}
+
+function addCubes(obj, x, y, z){
+  'use strict';
+  geometry = new THREE.CubeGeometry(4, 4 , 3);
+  material = new THREE.MeshBasicMaterial({ color: 0x000000, wireframe : wires});
+  mesh = new THREE.Mesh(geometry, material);
+  mesh.position.set(x, y, z);
+  obj.add(mesh);
+
+}
+function addCylinders(obj, x, y, z){
+  'use strict';
+  geometry = new THREE.CylinderGeometry(1.2, 1.2, 2, 32);
+  material = new THREE.MeshBasicMaterial({ color: 0xFFFFFF, wireframe : wires});
+  mesh = new THREE.Mesh(geometry, material);
+  mesh.position.set(x, y, z);
+  mesh.rotation.x = Math.PI / 2
+  obj.add(mesh);
+
+}
+
 
 class Wall extends Base_Object {
   constructor(x, y, z){
@@ -63,15 +144,7 @@ class Triangle extends Base_Object {
     }
   }
 
-class Painting extends Base_Object{
-    constructor(x, y, z){
-        super();
-        createPainting(this, x, y, z);
-    }
-    myType(){
-        return "Painting";
-    }
-}
+
 
 function createTriangle(obj,x,y,z){
     geometry = new THREE.Geometry();
@@ -108,6 +181,14 @@ function addBackWall(obj, x, y, z) {
     obj.add(mesh);
 }
 
+function addSideWall(obj, x, y, z) {
+  'use strict';
+  geometry = new THREE.CubeGeometry(2, 60, 80);
+  mesh = new THREE.Mesh(geometry, material);
+  mesh.position.set(x, y, z);
+  obj.add(mesh);
+}
+
 function addPedestalLeg(obj, x, y, z) {
     'use strict';
     material = new THREE.MeshBasicMaterial({ color: 0xA9A9A9, wireframe: wires });
@@ -127,19 +208,20 @@ function addPedestalTop(obj,x,y,z){
 
 }
 
-function createWall(table, x, y, z) {
+function createWall(obj, x, y, z) {
     'use strict';
 
 
-    material = new THREE.MeshBasicMaterial({ color: 0x667C26, wireframe: wires });
-    addGroundWall(table, 0, 0, 40);
-    addBackWall(table, 0, 30, 1);
-    addPedestalLeg(table, 0, 10, 45);
-    addPedestalTop(table, 0, 20, 45);
-    table.position.x = x;
-    table.position.y = y;
-    table.position.z = z;
-    grupo.add(table);
+    material = new THREE.MeshBasicMaterial({ color: 0xFFFFFF, wireframe: wires });
+    addGroundWall(obj, 0, 0, 40);
+    addBackWall(obj, 0, 30, 1);
+    addSideWall(obj, -40, 30, 40);
+    addPedestalLeg(obj, 70, 10, 45);
+    addPedestalTop(obj, 70, 20, 45);
+    obj.position.x = x;
+    obj.position.y = y;
+    obj.position.z = z;
+    grupo.add(obj);
 }
 
 function addHolofoteArtic(obj, x, y, z){
@@ -183,11 +265,6 @@ function onOroffLight(){
   var state = !directional_light.visible;
   directional_light.visible = state;
 }
-function createPainting(obj,x,y,z){
-    'use strict';
-
-    addSquares(obj);
-}
 
 function initMaterials(){
     material_array = new Array(3);
@@ -205,6 +282,8 @@ function createScene() {
 
     scene.add(new THREE.AxisHelper(100));
     initMaterials();
+
+    new Painting(0,30,3);
 
     new Triangle(20,0,20);
     new Wall(0,0,0);
@@ -230,8 +309,8 @@ function createCamera() {
 
 
     camera1[0].position.x =0;
-    camera1[0].position.y = 140;
-    camera1[0].position.z = 0;
+    camera1[0].position.y = 0;
+    camera1[0].position.z = 7;
     camera1[0].lookAt(scene.position);
 }
 
@@ -242,9 +321,9 @@ function createCamera2() {
   camera1[1] = new THREE.PerspectiveCamera( 65, 1920/1080, 1, 1000);
 
 
-  camera1[1].position.x = 40;
+  camera1[1].position.x = 50;
   camera1[1].position.y = 40;
-  camera1[1].position.z = 100;
+  camera1[1].position.z = 200;
   camera1[1].lookAt(scene.position);
 }
 function switch_camera(number) {
@@ -279,7 +358,7 @@ function onKeyDown(e) {
           }
         }
         break;
-    case 49: //1
+    case 54: //1
         switch_camera(0);
         break;
 
