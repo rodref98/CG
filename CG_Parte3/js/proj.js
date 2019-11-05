@@ -34,14 +34,36 @@ class Painting extends Base_Object{
 
 function createPainting(obj,x,y,z){
   'use strict';
+  var auxx = -24;
+  var auxy = 42;
+  var auxz = 3;
   addFrame(obj, x, y, z);
-  addBackground(obj, x, y ,z);
+  addBackground(obj, x, y ,z);  
+  for(var j = 0; j < 9; j ++){
+    auxy = 42;
+    if(j != 0) auxx += 6;  
+    for(var i = 0; i < 5; i++){
+      addCubes(obj, auxx, auxy, auxz);
+      auxy = auxy - 6;
+    }
+  }
+  auxx = -27;
+  auxy = 45; 
+  auxz = 5;
+  for(var j = 0; j < 10; j ++){
+    auxy = 45;
+    if(j != 0) auxx += 6;  
+    for(var i = 0; i < 6; i++){
+      addCylinders(obj, auxx, auxy, auxz);
+      auxy = auxy - 6;
+    }
+  }
   grupo.add(obj);
 }
 
 function addFrame(obj,x,y,z){
   'use strict';
-    geometry = new THREE.CubeGeometry(60, 40, 2);
+    geometry = new THREE.CubeGeometry(64, 40, 2);
     material = new THREE.MeshBasicMaterial({ color: 0xB8860B, wireframe : wires});
     mesh = new THREE.Mesh(geometry, material);
     mesh.position.set(x, y, z);
@@ -51,12 +73,32 @@ function addFrame(obj,x,y,z){
 
 function addBackground(obj,x,y,z){
   'use strict';
-    geometry = new THREE.CubeGeometry(54, 32, 2);
+    geometry = new THREE.CubeGeometry(56, 32, 2.5);
     material = new THREE.MeshBasicMaterial({ color: 0xA9A9A9, wireframe : wires});
     mesh = new THREE.Mesh(geometry, material);
     mesh.position.set(x, y, z);
     obj.add(mesh);  
   
+}
+
+function addCubes(obj, x, y, z){
+  'use strict';
+  geometry = new THREE.CubeGeometry(4, 4 , 3);
+  material = new THREE.MeshBasicMaterial({ color: 0x000000, wireframe : wires});
+  mesh = new THREE.Mesh(geometry, material);
+  mesh.position.set(x, y, z);
+  obj.add(mesh);
+
+}
+function addCylinders(obj, x, y, z){
+  'use strict';
+  geometry = new THREE.CylinderGeometry(1, 1, 2, 32);
+  material = new THREE.MeshBasicMaterial({ color: 0xFFFFFF, wireframe : wires});
+  mesh = new THREE.Mesh(geometry, material);
+  mesh.position.set(x, y, z);
+  mesh.rotation.x = Math.PI / 2
+  obj.add(mesh);
+
 }
 
 
@@ -166,8 +208,8 @@ function createWall(obj, x, y, z) {
     addGroundWall(obj, 0, 0, 40);
     addBackWall(obj, 0, 30, 1);
     addSideWall(obj, -40, 30, 40);
-    addPedestalLeg(obj, 0, 10, 45);
-    addPedestalTop(obj, 0, 20, 45);
+    addPedestalLeg(obj, 70, 10, 45);
+    addPedestalTop(obj, 70, 20, 45);
     obj.position.x = x;
     obj.position.y = y;
     obj.position.z = z;
@@ -239,8 +281,8 @@ function createCamera() {
 
 
     camera1[0].position.x =0;
-    camera1[0].position.y = 140;
-    camera1[0].position.z = 0;
+    camera1[0].position.y = 0;
+    camera1[0].position.z = 7;
     camera1[0].lookAt(scene.position);
 }
 
@@ -288,7 +330,7 @@ function onKeyDown(e) {
           }
         }
         break;
-    case 49: //1
+    case 54: //1
         switch_camera(0);
         break;
 
