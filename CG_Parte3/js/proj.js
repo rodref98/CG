@@ -92,7 +92,7 @@ function addCubes(obj, x, y, z){
 }
 function addCylinders(obj, x, y, z){
   'use strict';
-  geometry = new THREE.CylinderGeometry(1, 1, 2, 32);
+  geometry = new THREE.CylinderGeometry(1.2, 1.2, 2, 32);
   material = new THREE.MeshBasicMaterial({ color: 0xFFFFFF, wireframe : wires});
   mesh = new THREE.Mesh(geometry, material);
   mesh.position.set(x, y, z);
