@@ -63,6 +63,7 @@ function createPainting(obj,x,y,z){
 
 function addFrame(obj,x,y,z){
   'use strict';
+  
     geometry = new THREE.CubeGeometry(64, 40, 2);
     material = new THREE.MeshBasicMaterial({ color: 0xB8860B, wireframe : wires});
     mesh = new THREE.Mesh(geometry, material);
