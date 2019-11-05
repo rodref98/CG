@@ -8,7 +8,7 @@ var scene, renderer;
 var wires = true;
 var geometry, material, mesh;
 var grupo = new THREE.Group();
-var table;
+
 
 
 class Base_Object extends THREE.Object3D{
@@ -20,9 +20,45 @@ class Base_Object extends THREE.Object3D{
     return "Object";
   }
 
-
-
 }
+
+class Painting extends Base_Object{
+  constructor(x,y,z){
+    super();
+    createPainting(this, x, y, z);
+  }
+  myType(){
+    return "Painting";
+  }
+}
+
+function createPainting(obj,x,y,z){
+  'use strict';
+  addFrame(obj, x, y, z);
+  addBackground(obj, x, y ,z);
+  grupo.add(obj);
+}
+
+function addFrame(obj,x,y,z){
+  'use strict';
+    geometry = new THREE.CubeGeometry(60, 40, 2);
+    material = new THREE.MeshBasicMaterial({ color: 0xB8860B, wireframe : wires});
+    mesh = new THREE.Mesh(geometry, material);
+    mesh.position.set(x, y, z);
+    obj.add(mesh);  
+  
+}
+
+function addBackground(obj,x,y,z){
+  'use strict';
+    geometry = new THREE.CubeGeometry(54, 32, 2);
+    material = new THREE.MeshBasicMaterial({ color: 0xA9A9A9, wireframe : wires});
+    mesh = new THREE.Mesh(geometry, material);
+    mesh.position.set(x, y, z);
+    obj.add(mesh);  
+  
+}
+
 
 class Wall extends Base_Object {
   constructor(x, y, z){
@@ -58,15 +94,7 @@ class Triangle extends Base_Object {
     }
   }
 
-class Painting extends Base_Object{
-    constructor(x, y, z){
-        super();
-        createPainting(this, x, y, z);
-    }
-    myType(){
-        return "Painting";
-    }
-}
+
 
 function createTriangle(obj,x,y,z){
     geometry = new THREE.Geometry();
@@ -103,6 +131,14 @@ function addBackWall(obj, x, y, z) {
     obj.add(mesh);
 }
 
+function addSideWall(obj, x, y, z) {
+  'use strict';
+  geometry = new THREE.CubeGeometry(2, 60, 80);
+  mesh = new THREE.Mesh(geometry, material);
+  mesh.position.set(x, y, z);
+  obj.add(mesh);
+}
+
 function addPedestalLeg(obj, x, y, z) {
     'use strict';
     material = new THREE.MeshBasicMaterial({ color: 0xA9A9A9, wireframe: wires });
@@ -122,19 +158,20 @@ function addPedestalTop(obj,x,y,z){
    
 }
 
-function createWall(table, x, y, z) {
+function createWall(obj, x, y, z) {
     'use strict';
 
 
     material = new THREE.MeshBasicMaterial({ color: 0xFFFFFF, wireframe: wires });
-    addGroundWall(table, 0, 0, 40);
-    addBackWall(table, 0, 30, 1);
-    addPedestalLeg(table, 0, 10, 45);
-    addPedestalTop(table, 0, 20, 45);
-    table.position.x = x;
-    table.position.y = y;
-    table.position.z = z;
-    grupo.add(table);
+    addGroundWall(obj, 0, 0, 40);
+    addBackWall(obj, 0, 30, 1);
+    addSideWall(obj, -40, 30, 40);
+    addPedestalLeg(obj, 0, 10, 45);
+    addPedestalTop(obj, 0, 20, 45);
+    obj.position.x = x;
+    obj.position.y = y;
+    obj.position.z = z;
+    grupo.add(obj);
 }
 
 function addHolofoteArtic(obj, x, y, z){
@@ -174,13 +211,6 @@ function createHolofote(index, x, y, z) {
     grupo.add(index);
 }
 
-function createPainting(obj,x,y,z){
-    'use strict';
-
-    addSquares(obj);
-}
-
-
 function createScene() {
     'use strict';
 
@@ -188,12 +218,14 @@ function createScene() {
 
     scene.add(new THREE.AxisHelper(100));
 
+    new Painting(0,30,3);
+
     new Triangle(20,0,20);
     new Wall(0,0,0);
-    new Holofote(-25, 25, 30);
-    new Holofote(-10, 25, 30);
-    new Holofote(5, 25, 30);
-    new Holofote(20, 25, 30);
+    new Holofote(-25, 70, 30);
+    new Holofote(-10, 70, 30);
+    new Holofote(5, 70, 30);
+    new Holofote(20, 70, 30);
 
     scene.add(grupo);
 
@@ -219,9 +251,9 @@ function createCamera2() {
   camera1[1] = new THREE.PerspectiveCamera( 45, 1920/1080, 1, 1000);
 
 
-  camera1[1].position.x = 40;
+  camera1[1].position.x = 50;
   camera1[1].position.y = 40;
-  camera1[1].position.z = 100;
+  camera1[1].position.z = 200;
   camera1[1].lookAt(scene.position);
 }
 function switch_camera(number) {
