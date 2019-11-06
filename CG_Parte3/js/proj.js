@@ -7,6 +7,8 @@ var active_camera = 0;
 var scene, renderer;
 var wires = true;
 var geometry, material, mesh;
+var spaceship;
+var spaceshipmat;
 var grupo = new THREE.Group();
 var directional_light;
 var material_array;
@@ -351,7 +353,152 @@ function initMaterials(){
     material_array[0] = new THREE.MeshBasicMaterial({ color: 0xFFFFFF, wireframe: !wires });
     material_array[1] = new THREE.MeshLambertMaterial({ color: 0xFFFFFF});
     material_array[2] = new THREE.MeshPhongMaterial({ color: 0xFFFFFF, shininess: 50 });
+
+    spaceshipmat = new Array(3);
+	  spaceshipmat[0] = new THREE.MeshBasicMaterial( {color: 0x00ff00, wireframe: wires });
+	  spaceshipmat[1] = new THREE.MeshLambertMaterial( {color: 0x00ff00, wireframe: wires });
+	  spaceshipmat[2] = new THREE.MeshPhongMaterial( {color: 0x00ff00, wireframe: wires , shininess: 100});
 }
+
+
+
+
+function customSpaceship() {
+	var geo = new THREE.Geometry();
+
+	var vertex = [];
+
+	/* Comparar valores antigos
+	addBox(meshes, spaceshipMaterial, 0, 0, 0, 7, 2, 3);
+	addBox(meshes, spaceshipMaterial, 0, 1.5, 0, 5, 1, 3);
+	addBox(meshes, spaceshipMaterial, 0, 2.5, 0, 1, 1, 3);
+	addBox(meshes, spaceshipMaterial, 0, 3.5, 0, 0.5, 1, 3);*/
+
+	createVertexGroup(vertex, -3.5, 3.5, 0, 2, 0, 1.5);
+	createVertexGroup(vertex, -2.5, 2.5, 2, 3, 0, 1.5);
+	createVertexGroup(vertex, -1, 1, 3, 4, 0, 1.5);
+	createVertexGroup(vertex, -0.25, 0.25, 4, 5, 0, 1.5);
+
+	var faces = [];
+
+	// Biggest Part
+	createFace(faces, 0, 1, 2, 3, 0); 	//Bottom
+	createFace(faces, 4, 5, 6, 7, 1); 	//Top
+	createFace(faces, 0, 2, 4, 6, 0); 	//Left
+	createFace(faces, 1, 3, 5, 7, 1);	//Right
+	createFace(faces, 6, 7, 2, 3, 1);	//Front
+	createFace(faces, 4, 14, 0, 10, 0);	//Back-Left
+	createFace(faces, 15, 5, 11, 1, 0);	//Back-Right
+
+	// Medium Part
+	createFace(faces, 8, 9, 10, 11, 0);		//Bottom
+	createFace(faces, 12, 13, 14, 15, 1);	//Top
+	createFace(faces, 8, 10, 12, 14, 0); 	//Left
+	createFace(faces, 9, 11, 13, 15, 1);	//Right
+	createFace(faces, 12, 22, 8, 18, 0);	//Back-Left
+	createFace(faces, 23, 13, 19, 9, 0);	//Back-Right
+
+	// Small Part
+	createFace(faces, 16, 17, 18, 19, 0); //Bottom
+	createFace(faces, 20, 21, 22, 23, 1); //Top
+	createFace(faces, 16, 18, 20, 22, 0); //Left
+	createFace(faces, 17, 19, 21, 23, 1); //Right
+	createFace(faces, 20, 30, 16, 26, 0); //Back-Left
+	createFace(faces, 31, 21, 27, 17, 0); //Back-Right
+
+	// Pointy Part
+	createFace(faces, 24, 25, 26, 27, 0); //Bottom
+	createFace(faces, 28, 29, 30, 31, 1); //Top
+	createFace(faces, 24, 26, 28, 30, 0); //Left
+	createFace(faces, 25, 27, 29, 31, 1); //Right
+	createFace(faces, 28, 29, 24, 25, 0); //Back
+
+	geo.vertices = vertex;
+	geo.faces = faces;
+	geo.computeFaceNormals();
+
+	return geo;
+}
+
+function createSpaceship(x, y, z) {
+
+  spaceship = new THREE.Object3D();
+	var meshes = [];
+
+	var spaceshipMaterial = spaceshipmat[0];
+
+	/*addBox(meshes, spaceshipMaterial, 0, 0, 0, 7, 2, 3);
+	addBox(meshes, spaceshipMaterial, 0, 1.5, 0, 5, 1, 3);
+	addBox(meshes, spaceshipMaterial, 0, 2.5, 0, 1, 1, 3);
+	addBox(meshes, spaceshipMaterial, 0, 3.5, 0, 0.5, 1, 3);*/
+
+	var geo = customSpaceship();
+	/*var geo = mergeMeshes(meshes);*/
+	geo.computeFaceNormals();
+	var mesh = new THREE.Mesh(geo, spaceshipMaterial);
+	spaceship.add(mesh);
+
+	spaceship.position.x = x;
+	spaceship.position.y = y;
+	spaceship.position.z = z;
+
+	grupo.add(spaceship);
+}
+
+
+function createFace(faces, v0, v1, v2, v3, side) {
+	if (side) {
+		faces.push(
+			new THREE.Face3(v0, v2, v1),
+			new THREE.Face3(v1, v2, v3)
+		);
+	}
+
+	else {
+		faces.push(
+			new THREE.Face3(v0, v1, v2),
+			new THREE.Face3(v1, v3, v2)
+		);
+	}
+}
+
+
+
+function createVertexGroup(vertex, x0, x1, y0, y1, z0, z1) {
+	vertex.push(
+		new THREE.Vector3(x0, y1, z0),  // v0  v1
+		new THREE.Vector3(x1, y1, z0),	// v2  v3
+		new THREE.Vector3(x0, y0, z0),
+		new THREE.Vector3(x1, y0, z0),
+
+		new THREE.Vector3(x0, y1, z1), 	// v4  v5
+		new THREE.Vector3(x1, y1, z1),	// v6  v7
+		new THREE.Vector3(x0, y0, z1),
+		new THREE.Vector3(x1, y0, z1)
+	);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -371,6 +518,7 @@ function createScene() {
     new Spotlight(-10, 25, 30);
     new Spotlight(5, 25, 30);
     new Spotlight(20, 25, 30);
+    createSpaceship(0,0,0);
     directional_light = new THREE.DirectionalLight(0xffffff, 1);
     directional_light.position.set(20, 40, 30);
     directional_light.castShadow = true;
