@@ -8,9 +8,7 @@ var scene, renderer;
 var wires = true;
 var geometry, material, mesh;
 var grupo = new THREE.Group();
-var obj;
 var directional_light;
-var holofote2;
 var material_array;
 var material_counter = 0;
 
@@ -121,14 +119,14 @@ class Wall extends Base_Object {
   }
 }
 
-class Holofote extends Base_Object {
+class Spotlight extends Base_Object {
   constructor(x, y, z){
     super();
-    createHolofote(this, x, y, z);
+    createSpotlight(this, x, y, z);
   }
 
   myType(){
-    return "Holofote";
+    return "Spotlight";
   }
 
 }
@@ -224,7 +222,7 @@ function createWall(obj, x, y, z) {
     grupo.add(obj);
 }
 
-function addHolofoteArtic(obj, x, y, z){
+function addSpotlightArtic(obj, x, y, z){
 
     geometry = new THREE.SphereBufferGeometry(3.9, 8, 6, 0, 2*Math.PI, -Math.PI/2, 0.5 * Math.PI);
     material.side = THREE.DoubleSide;
@@ -234,7 +232,7 @@ function addHolofoteArtic(obj, x, y, z){
 
 }
 
-function addHolofoteCone(obj, x, y, z) {
+function addSpotlightCone(obj, x, y, z) {
     'use strict';
 
     geometry = new THREE.CylinderGeometry(4, 0, 10, 22, 0, true);
@@ -245,14 +243,14 @@ function addHolofoteCone(obj, x, y, z) {
     obj.add(mesh);
 }
 
-function createHolofote(index, x, y, z) {
+function createSpotlight(index, x, y, z) {
     'use strict';
 
 
     material = new THREE.MeshBasicMaterial({ color: 0x1E90FF, wireframe: wires });
     //material = new THREE.MeshLambertMaterial( { color:0xff0000} );
-    addHolofoteCone(index, 0, 10, 0);
-    addHolofoteArtic(index, 0, 14, 0);
+    addSpotlightCone(index, 0, 10, 0);
+    addSpotlightArtic(index, 0, 14, 0);
 
     index.rotation.z = Math.PI/2;
     index.rotation.y = -Math.PI/2;
@@ -287,10 +285,10 @@ function createScene() {
 
     new Triangle(20,0,20);
     new Wall(0,0,0);
-    new Holofote(-25, 25, 30);
-    holofote2 = new Holofote(-10, 25, 30);
-    new Holofote(5, 25, 30);
-    new Holofote(20, 25, 30);
+    new Spotlight(-25, 25, 30);
+    new Spotlight(-10, 25, 30);
+    new Spotlight(5, 25, 30);
+    new Spotlight(20, 25, 30);
     directional_light = new THREE.DirectionalLight(0xffffff, 1);
     directional_light.position.set(0, 20, 50);
     directional_light.castShadow = true;
