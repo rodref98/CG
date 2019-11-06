@@ -12,6 +12,10 @@ var directional_light;
 var material_array;
 var mSpotlight_array = new Array(3);
 var mPedestal_array = new Array(3);
+var mFrame_array = new Array(3);
+var mBackground_array = new Array(3);
+var mCubes_array = new Array(3);
+var mCyllinders_array = new Array(3);
 var material_counter = 0;
 
 class Base_Object extends THREE.Object3D{
@@ -26,10 +30,32 @@ class Base_Object extends THREE.Object3D{
       }
     }
     else if(this.myType() == "Spotlight"){
-      this.material = mSpotlight_array[material_counter];
+      for (var j = 0; j < this.children.length; j++){
+        this.children[j].material = mSpotlight_array[material_counter];
+      }
     }
     else if(this.myType() == "Pedestal"){
-      this.material = mPedestal_array[material_counter];
+      this.children[0].material = mPedestal_array[material_counter];
+      this.children[1].material = mPedestal_array[material_counter];
+    }
+    else if(this.myType() == "Painting"){
+      console.log(this.children.length);
+      for (var j = 0; j < this.children.length; j++){
+        if(j == 0) {
+            this.children[j].material = mFrame_array[material_counter];
+          }
+        else if(j == 1){
+            this.children[j].material = mBackground_array[material_counter];
+          }
+        else if(j > 1 && j < 47){
+
+            this.children[j].material = mCubes_array[material_counter];
+          }
+        else {
+            this.children[j].material = mCyllinders_array[material_counter];
+          }
+      }
+
     }
   }
 
@@ -129,6 +155,9 @@ function addFrame(obj,x,y,z){
 
     geometry = new THREE.CubeGeometry(64, 40, 2);
     material = new THREE.MeshBasicMaterial({ color: 0xB8860B, wireframe : wires});
+    mFrame_array[0] = new THREE.MeshBasicMaterial({ color: 0xB8860B, wireframe: !wires });
+    mFrame_array[1] = new THREE.MeshLambertMaterial({color: 0xB8860B})
+    mFrame_array[2] = new THREE.MeshPhongMaterial({ color: 0xB8860B, shininess: 50 });
     mesh = new THREE.Mesh(geometry, material);
     mesh.position.set(x, y, z);
     obj.add(mesh);
@@ -139,6 +168,9 @@ function addBackground(obj,x,y,z){
   'use strict';
     geometry = new THREE.CubeGeometry(56, 32, 2.5);
     material = new THREE.MeshBasicMaterial({ color: 0xA9A9A9, wireframe : wires});
+    mBackground_array[0] = new THREE.MeshBasicMaterial({ color: 0xA9A9A9, wireframe: !wires });
+    mBackground_array[1] = new THREE.MeshLambertMaterial({color: 0xA9A9A9})
+    mBackground_array[2] = new THREE.MeshPhongMaterial({ color: 0xA9A9A9, shininess: 50 });
     mesh = new THREE.Mesh(geometry, material);
     mesh.position.set(x, y, z);
     obj.add(mesh);
@@ -149,6 +181,9 @@ function addCubes(obj, x, y, z){
   'use strict';
   geometry = new THREE.CubeGeometry(4, 4 , 3);
   material = new THREE.MeshBasicMaterial({ color: 0x000000, wireframe : wires});
+  mCubes_array[0] = new THREE.MeshBasicMaterial({ color: 0x000000, wireframe: !wires });
+  mCubes_array[1] = new THREE.MeshLambertMaterial({color: 0x000000})
+  mCubes_array[2] = new THREE.MeshPhongMaterial({ color: 0x000000, shininess: 50 });
   mesh = new THREE.Mesh(geometry, material);
   mesh.position.set(x, y, z);
   obj.add(mesh);
@@ -158,6 +193,9 @@ function addCylinders(obj, x, y, z){
   'use strict';
   geometry = new THREE.CylinderGeometry(1.2, 1.2, 2, 32);
   material = new THREE.MeshBasicMaterial({ color: 0xFFFFFF, wireframe : wires});
+  mCyllinders_array[0] = new THREE.MeshBasicMaterial({ color: 0xFFFFFF, wireframe: !wires });
+  mCyllinders_array[1] = new THREE.MeshLambertMaterial({color: 0xFFFFFF})
+  mCyllinders_array[2] = new THREE.MeshPhongMaterial({ color: 0xFFFFFF, shininess: 50 });
   mesh = new THREE.Mesh(geometry, material);
   mesh.position.set(x, y, z);
   mesh.rotation.x = Math.PI / 2
@@ -211,10 +249,24 @@ function addSideWall(obj, x, y, z) {
   obj.add(mesh);
 }
 
+function createWall(obj, x, y, z) {
+  'use strict';
+
+
+  material = new THREE.MeshBasicMaterial({ color: 0xFFFFFF, wireframe: wires });
+  addGroundWall(obj, 0, 0, 40);
+  addBackWall(obj, 0, 30, 1);
+  addSideWall(obj, -40, 30, 40);
+  obj.position.x = x;
+  obj.position.y = y;
+  obj.position.z = z;
+  grupo.add(obj);
+}
+
 function addPedestalLeg(obj, x, y, z) {
     'use strict';
     material = new THREE.MeshBasicMaterial({ color: 0x1E90FF, wireframe: wires });
-    mPedestal_array[0] = new THREE.MeshBasicMaterial({ color: 0x1E90FF, wireframe: wires });
+    mPedestal_array[0] = new THREE.MeshBasicMaterial({ color: 0x1E90FF, wireframe: !wires });
     mPedestal_array[1] = new THREE.MeshLambertMaterial({color: 0x1E90FF})
     mPedestal_array[2] = new THREE.MeshPhongMaterial({ color: 0x1E90FF, shininess: 50 });
     geometry = new THREE.CubeGeometry(3, 20, 3);
@@ -225,7 +277,7 @@ function addPedestalLeg(obj, x, y, z) {
 
 function addPedestalTop(obj,x,y,z){
     'use strict';
-    material = new THREE.MeshBasicMaterial({ color: 0x1E90FF, wireframe: wires });
+    material = new THREE.MeshBasicMaterial({ color: 0x1E90FF, wireframe: !wires });
     geometry = new THREE.CubeGeometry(12, 1, 12);
     mesh = new THREE.Mesh(geometry, material);
     mesh.position.set(x, y, z);
@@ -244,19 +296,6 @@ function createPedestal(obj, x, y, z) {
     grupo.add(obj);
 }
 
-function createWall(obj, x, y, z) {
-    'use strict';
-
-
-    material = new THREE.MeshBasicMaterial({ color: 0xFFFFFF, wireframe: wires });
-    addGroundWall(obj, 0, 0, 40);
-    addBackWall(obj, 0, 30, 1);
-    addSideWall(obj, -40, 30, 40);
-    obj.position.x = x;
-    obj.position.y = y;
-    obj.position.z = z;
-    grupo.add(obj);
-}
 
 function addSpotlightArtic(obj, x, y, z){
 
@@ -284,7 +323,7 @@ function createSpotlight(index, x, y, z) {
 
 
     material = new THREE.MeshBasicMaterial({ color: 0x1E90FF, wireframe: wires });
-    mSpotlight_array[0] = new THREE.MeshBasicMaterial({ color: 0x1E90FF, wireframe: wires });
+    mSpotlight_array[0] = new THREE.MeshBasicMaterial({ color: 0x1E90FF, wireframe: !wires });
     mSpotlight_array[1] = new THREE.MeshLambertMaterial({color: 0x1E90FF})
     mSpotlight_array[2] = new THREE.MeshPhongMaterial({ color: 0x1E90FF, shininess: 50 });
     //material = new THREE.MeshLambertMaterial( { color:0xff0000} );
@@ -333,8 +372,9 @@ function createScene() {
     new Spotlight(5, 25, 30);
     new Spotlight(20, 25, 30);
     directional_light = new THREE.DirectionalLight(0xffffff, 1);
-    directional_light.position.set(0, 20, 50);
+    directional_light.position.set(20, 40, 30);
     directional_light.castShadow = true;
+    directional_light.target.position.set( 0, 0, 40 );
     scene.add(directional_light);
     scene.add(grupo);
     //directional_light.target = grupo.children[1];
@@ -362,9 +402,9 @@ function createCamera2() {
   camera1[1] = new THREE.PerspectiveCamera( 65, 1920/1080, 1, 1000);
 
 
-  camera1[1].position.x = 50;
-  camera1[1].position.y = 40;
-  camera1[1].position.z = 200;
+  camera1[1].position.x = 40;
+  camera1[1].position.y = 30;
+  camera1[1].position.z = 150;
   camera1[1].lookAt(scene.position);
 }
 function switch_camera(number) {
