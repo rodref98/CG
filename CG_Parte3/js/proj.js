@@ -10,6 +10,8 @@ var geometry, material, mesh;
 var grupo = new THREE.Group();
 var directional_light;
 var material_array;
+var mSpotlight_array = new Array(3);
+var mPedestal_array = new Array(3);
 var material_counter = 0;
 
 class Base_Object extends THREE.Object3D{
@@ -17,8 +19,18 @@ class Base_Object extends THREE.Object3D{
     super();
 	}
 
-  changeMaterial(material){
-    this.children[0].material = material;
+  changeMaterial(){
+    if(this.myType() != "Painting" && this.myType() != "Spotlight" && this.myType() != "Pedestal"){
+      for (var j = 0; j < this.children.length; j++){
+        this.children[j].material = material_array[material_counter];
+      }
+    }
+    else if(this.myType() == "Spotlight"){
+      this.material = mSpotlight_array[material_counter];
+    }
+    else if(this.myType() == "Pedestal"){
+      this.material = mPedestal_array[material_counter];
+    }
   }
 
   myType(){
@@ -36,6 +48,52 @@ class Painting extends Base_Object{
     return "Painting";
   }
 }
+
+class Wall extends Base_Object {
+  constructor(x, y, z){
+    super();
+    createWall(this, x, y, z);
+  }
+
+  myType(){
+    return "Wall";
+  }
+}
+
+class Pedestal extends Base_Object {
+  constructor(x, y, z){
+    super();
+    createPedestal(this, x, y, z);
+  }
+
+  myType(){
+    return "Pedestal";
+  }
+}
+
+class Spotlight extends Base_Object {
+  constructor(x, y, z){
+    super();
+    createSpotlight(this, x, y, z);
+  }
+
+  myType(){
+    return "Spotlight";
+  }
+
+}
+
+class Triangle extends Base_Object {
+  constructor(x, y, z){
+    super();
+    createTriangle(this, x, y, z);
+  }
+
+  myType(){
+    return "Triangle";
+  }
+}
+
 
 function createPainting(obj,x,y,z){
   'use strict';
@@ -108,40 +166,6 @@ function addCylinders(obj, x, y, z){
 }
 
 
-class Wall extends Base_Object {
-  constructor(x, y, z){
-    super();
-    createWall(this, x, y, z);
-  }
-
-  myType(){
-    return "Wall";
-  }
-}
-
-class Spotlight extends Base_Object {
-  constructor(x, y, z){
-    super();
-    createSpotlight(this, x, y, z);
-  }
-
-  myType(){
-    return "Spotlight";
-  }
-
-}
-
-class Triangle extends Base_Object {
-    constructor(x, y, z){
-      super();
-      createTriangle(this, x, y, z);
-    }
-
-    myType(){
-      return "Triangle";
-    }
-  }
-
 
 
 function createTriangle(obj,x,y,z){
@@ -189,7 +213,10 @@ function addSideWall(obj, x, y, z) {
 
 function addPedestalLeg(obj, x, y, z) {
     'use strict';
-    material = new THREE.MeshBasicMaterial({ color: 0xA9A9A9, wireframe: wires });
+    material = new THREE.MeshBasicMaterial({ color: 0x1E90FF, wireframe: wires });
+    mPedestal_array[0] = new THREE.MeshBasicMaterial({ color: 0x1E90FF, wireframe: wires });
+    mPedestal_array[1] = new THREE.MeshLambertMaterial({color: 0x1E90FF})
+    mPedestal_array[2] = new THREE.MeshPhongMaterial({ color: 0x1E90FF, shininess: 50 });
     geometry = new THREE.CubeGeometry(3, 20, 3);
     mesh = new THREE.Mesh(geometry, material);
     mesh.position.set(x, y, z);
@@ -198,12 +225,23 @@ function addPedestalLeg(obj, x, y, z) {
 
 function addPedestalTop(obj,x,y,z){
     'use strict';
-    material = new THREE.MeshBasicMaterial({ color: 0xA9A9A9, wireframe: wires });
+    material = new THREE.MeshBasicMaterial({ color: 0x1E90FF, wireframe: wires });
     geometry = new THREE.CubeGeometry(12, 1, 12);
     mesh = new THREE.Mesh(geometry, material);
     mesh.position.set(x, y, z);
     obj.add(mesh);
 
+}
+
+function createPedestal(obj, x, y, z) {
+    'use strict';
+
+    addPedestalLeg(obj, 70, 10, 45);
+    addPedestalTop(obj, 70, 20, 45);
+    obj.position.x = x;
+    obj.position.y = y;
+    obj.position.z = z;
+    grupo.add(obj);
 }
 
 function createWall(obj, x, y, z) {
@@ -214,8 +252,6 @@ function createWall(obj, x, y, z) {
     addGroundWall(obj, 0, 0, 40);
     addBackWall(obj, 0, 30, 1);
     addSideWall(obj, -40, 30, 40);
-    addPedestalLeg(obj, 70, 10, 45);
-    addPedestalTop(obj, 70, 20, 45);
     obj.position.x = x;
     obj.position.y = y;
     obj.position.z = z;
@@ -248,6 +284,9 @@ function createSpotlight(index, x, y, z) {
 
 
     material = new THREE.MeshBasicMaterial({ color: 0x1E90FF, wireframe: wires });
+    mSpotlight_array[0] = new THREE.MeshBasicMaterial({ color: 0x1E90FF, wireframe: wires });
+    mSpotlight_array[1] = new THREE.MeshLambertMaterial({color: 0x1E90FF})
+    mSpotlight_array[2] = new THREE.MeshPhongMaterial({ color: 0x1E90FF, shininess: 50 });
     //material = new THREE.MeshLambertMaterial( { color:0xff0000} );
     addSpotlightCone(index, 0, 10, 0);
     addSpotlightArtic(index, 0, 14, 0);
@@ -260,15 +299,19 @@ function createSpotlight(index, x, y, z) {
     grupo.add(index);
 }
 function onOroffLight(){
+  'use strict';
+
   var state = !directional_light.visible;
   directional_light.visible = state;
 }
 
 function initMaterials(){
+  'use strict';
+
     material_array = new Array(3);
-    material_array[0] = new THREE.MeshBasicMaterial({ color: 0xFFFFFF, wireframe: wires });
+    material_array[0] = new THREE.MeshBasicMaterial({ color: 0xFFFFFF, wireframe: !wires });
     material_array[1] = new THREE.MeshLambertMaterial({ color: 0xFFFFFF});
-    material_array[2] = new THREE.MeshPhongMaterial({ color: 0xFFFFFF, shininess: 30 });
+    material_array[2] = new THREE.MeshPhongMaterial({ color: 0xFFFFFF, shininess: 50 });
 }
 
 
@@ -281,8 +324,8 @@ function createScene() {
     scene.add(new THREE.AxisHelper(100));
     initMaterials();
 
-    new Painting(0,30,3);
-
+    var painting = new Painting(0,30,3);
+    new Pedestal(0, 0, 0);
     new Triangle(20,0,20);
     new Wall(0,0,0);
     new Spotlight(-25, 25, 30);
@@ -373,9 +416,7 @@ function onKeyDown(e) {
         }
         console.log(material_counter);
         for(var i = 0; i < grupo.children.length; i++){
-          for (var j = 0; j < grupo.children[i].children.length; j++){
-            grupo.children[i].children[j].material = material_array[material_counter];
-          }
+          grupo.children[i].changeMaterial();
         }
         break
     case 69:  //E
