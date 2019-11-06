@@ -8,7 +8,8 @@ var scene, renderer;
 var wires = true;
 var geometry, material, mesh;
 var grupo = new THREE.Group();
-var table;
+var icosaedro;
+
 
 
 class Base_Object extends THREE.Object3D{
@@ -19,9 +20,6 @@ class Base_Object extends THREE.Object3D{
   myType(){
     return "Object";
   }
-
-
-
 }
 
 class Wall extends Base_Object {
@@ -47,16 +45,6 @@ class Holofote extends Base_Object {
 
 }
 
-class Triangle extends Base_Object {
-    constructor(x, y, z){
-      super();
-      createTriangle(this, x, y, z);
-    }
-
-    myType(){
-      return "Triangle";
-    }
-  }
 
 class Painting extends Base_Object{
     constructor(x, y, z){
@@ -67,24 +55,17 @@ class Painting extends Base_Object{
         return "Painting";
     }
 }
-
-function createTriangle(obj,x,y,z){
-    geometry = new THREE.Geometry();
-    material = new THREE.MeshBasicMaterial({ color: 0xFFFFFF, wireframe: wires });
-    var v1 = new THREE.Vector3(0, 0, 0);
-    var v2 = new THREE.Vector3(0, 0, -30);
-    var v3 = new THREE.Vector3(0, 30, -30);
-    var triangle = new THREE.Triangle(v1, v2, v3);
-    var normal = triangle.normal();
-    geometry.vertices.push(triangle.a);
-    geometry.vertices.push(triangle.b);
-    geometry.vertices.push(triangle.c);
-    geometry.faces.push(new THREE.Face3(0, 1, 2, normal));
-    mesh = new THREE.Mesh(geometry, material);
-    mesh.position.set(x,y,z);
-    scene.add(mesh);
-
+class Icosaedro extends Base_Object{
+    constructor(x, y, z){
+        super();
+        createIcosaedro(this,x,y,z);
+    }
+    myType(){
+        return "Icosaedro";
+    }
 }
+
+
 
 
 function addGroundWall(obj, x, y, z) {
@@ -129,8 +110,8 @@ function createWall(table, x, y, z) {
     material = new THREE.MeshBasicMaterial({ color: 0xFFFFFF, wireframe: wires });
     addGroundWall(table, 0, 0, 40);
     addBackWall(table, 0, 30, 1);
-    addPedestalLeg(table, 0, 10, 45);
-    addPedestalTop(table, 0, 20, 45);
+    addPedestalLeg(table, 10, 10, 55);
+    addPedestalTop(table, 10, 20, 55);
     table.position.x = x;
     table.position.y = y;
     table.position.z = z;
@@ -180,6 +161,58 @@ function createPainting(obj,x,y,z){
     addSquares(obj);
 }
 
+function createFace(faces, v0, v1, v2) {
+	faces.push(
+		new THREE.Face3(v0, v1, v2)
+	);
+    
+}
+
+function createVertexGroup(vertex, x0, x1, y0, y1, z0, z1) {
+	vertex.push(
+		new THREE.Vector3(x0, y0, z0),  
+		new THREE.Vector3(x0, y1, z0),	
+        new THREE.Vector3(x0, y0, z1)
+    );
+}
+
+
+function createAllFaces(){
+    
+    var geometry = new THREE.Geometry();
+    var faces = [];
+    var vertex = [];
+
+    createVertexGroup(vertex, 0, 35, 0, 20, 0, 15);
+
+    createFace(faces, 0, 10, 20); 	
+	
+
+	
+
+    geometry.vertex = vertex;
+    geometry.faces = faces;
+    geometry.computeVertexNormals();
+    geometry.computeFaceNormals();
+    return geometry;
+    
+}
+
+function createIcosaedro(obj,x,y,z){
+    var geometry = createAllFaces();
+    material = new THREE.MeshBasicMaterial({ color: 0x99ffcc, wireframe: wires });
+
+
+    geometry.computeFaceNormals();
+    var mesh = new THREE.Mesh(geometry, material);
+    obj.add(mesh);
+    
+    obj.position.x = x;
+    obj.position.y = y;
+    obj.position.z = z;
+
+    grupo.add(obj)
+}
 
 function createScene() {
     'use strict';
@@ -188,13 +221,12 @@ function createScene() {
 
     scene.add(new THREE.AxisHelper(100));
 
-    new Triangle(20,0,20);
     new Wall(0,0,0);
     new Holofote(-25, 25, 30);
     new Holofote(-10, 25, 30);
     new Holofote(5, 25, 30);
     new Holofote(20, 25, 30);
-
+    new Icosaedro(10,20,55);
     scene.add(grupo);
 
 }
