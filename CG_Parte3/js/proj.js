@@ -4,6 +4,7 @@
 var camera1 = new Array(2);
 var active_camera = 0;
 
+var spaceshipmovement = true;
 var scene, renderer;
 var wires = true;
 var geometry, material, mesh;
@@ -727,10 +728,15 @@ function onKeyUp(e) {
 	renderer.render(scene, camera1[active_camera]);
 }
 
+function spaceshipMove(){
+  if(spaceshipmovement){
+    spaceship.rotateY(Math.PI/96);
+  }
+}
 function animate() {
   //Renders Scene
   requestAnimationFrame(animate);
-
+  spaceshipMove();
   render();
 }
 
