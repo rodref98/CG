@@ -264,7 +264,7 @@ function createWall(obj, x, y, z) {
   'use strict';
 
 
-  material = new THREE.MeshBasicMaterial({ color: 0xFFFFFF, wireframe: !wires });
+  material = new THREE.MeshBasicMaterial({ color: 0xFFFFFF, wireframe: wires });
   addGroundWall(obj, 0, 0, 40);
   addBackWall(obj, 0, 30, 1);
   addSideWall(obj, -40, 30, 40);
@@ -548,10 +548,15 @@ function createScene() {
     new Pedestal(-40, 0, 0);
     new Triangle(20,0,20);
     new Wall(0,0,0);
-    spotlight1 = new Spotlight(0, 55, 60, 0, 30, 0);
-    spotlight2 = new Spotlight(100, 40, 30, 70, 20, 45);
-    spotlight3 = new Spotlight(5, 25, 30, 10 , 10, 10);
-    spotlight4 = new Spotlight(20, 25, 30, 10 ,10 ,10);
+    spotlight1 = new Spotlight(0, 30, 80, 0, 30, 0);
+    spotlight1.rotateX(Math.PI/12);
+    spotlight2 = new Spotlight(100, 40, 30, 70, 20, 20);
+    spotlight2.rotateX(Math.PI/3);
+    spotlight3 = new Spotlight(-30, 25, 90, 10 , 10, 10);
+    spotlight3.rotateX(-Math.PI/6);
+    spotlight4 = new Spotlight(40, 25, 90, 10 ,10 ,0);
+    spotlight4.rotateX(Math.PI/12);
+
     createSpaceship(0,0,0);
     directional_light = new THREE.DirectionalLight(0xffffff, 1);
     directional_light.position.set(40, 80, 60);
