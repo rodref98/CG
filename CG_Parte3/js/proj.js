@@ -11,16 +11,105 @@ var grupo = new THREE.Group();
 var icosaedro;
 
 
+var directional_light;
+var material_array;
+var material_counter = 0;
 
 class Base_Object extends THREE.Object3D{
   constructor(){
     super();
 	}
 
+  changeMaterial(material){
+    this.children[0].material = material;
+  }
+
   myType(){
     return "Object";
   }
+
 }
+
+class Painting extends Base_Object{
+  constructor(x,y,z){
+    super();
+    createPainting(this, x, y, z);
+  }
+  myType(){
+    return "Painting";
+  }
+}
+
+function createPainting(obj,x,y,z){
+  'use strict';
+  var auxx = -24;
+  var auxy = 42;
+  var auxz = 3;
+  addFrame(obj, x, y, z);
+  addBackground(obj, x, y ,z);
+  for(var j = 0; j < 9; j ++){
+    auxy = 42;
+    if(j != 0) auxx += 6;
+    for(var i = 0; i < 5; i++){
+      addCubes(obj, auxx, auxy, auxz);
+      auxy = auxy - 6;
+    }
+  }
+  auxx = -27;
+  auxy = 45;
+  auxz = 5;
+  for(var j = 0; j < 10; j ++){
+    auxy = 45;
+    if(j != 0) auxx += 6;
+    for(var i = 0; i < 6; i++){
+      addCylinders(obj, auxx, auxy, auxz);
+      auxy = auxy - 6;
+    }
+  }
+  grupo.add(obj);
+}
+
+function addFrame(obj,x,y,z){
+  'use strict';
+
+    geometry = new THREE.CubeGeometry(64, 40, 2);
+    material = new THREE.MeshBasicMaterial({ color: 0xB8860B, wireframe : wires});
+    mesh = new THREE.Mesh(geometry, material);
+    mesh.position.set(x, y, z);
+    obj.add(mesh);
+
+}
+
+function addBackground(obj,x,y,z){
+  'use strict';
+    geometry = new THREE.CubeGeometry(56, 32, 2.5);
+    material = new THREE.MeshBasicMaterial({ color: 0xA9A9A9, wireframe : wires});
+    mesh = new THREE.Mesh(geometry, material);
+    mesh.position.set(x, y, z);
+    obj.add(mesh);
+
+}
+
+function addCubes(obj, x, y, z){
+  'use strict';
+  geometry = new THREE.CubeGeometry(4, 4 , 3);
+  material = new THREE.MeshBasicMaterial({ color: 0x000000, wireframe : wires});
+  mesh = new THREE.Mesh(geometry, material);
+  mesh.position.set(x, y, z);
+  obj.add(mesh);
+
+}
+function addCylinders(obj, x, y, z){
+  'use strict';
+  geometry = new THREE.CylinderGeometry(1.2, 1.2, 2, 32);
+  material = new THREE.MeshBasicMaterial({ color: 0xFFFFFF, wireframe : wires});
+  mesh = new THREE.Mesh(geometry, material);
+  mesh.position.set(x, y, z);
+  mesh.rotation.x = Math.PI / 2
+  obj.add(mesh);
+
+}
+
 
 class Wall extends Base_Object {
   constructor(x, y, z){
@@ -33,44 +122,26 @@ class Wall extends Base_Object {
   }
 }
 
-class Holofote extends Base_Object {
+class Spotlight extends Base_Object {
   constructor(x, y, z){
     super();
-    createHolofote(this, x, y, z);
+    createSpotlight(this, x, y, z);
   }
 
   myType(){
-    return "Holofote";
+    return "Spotlight";
   }
 
 }
 
 
-class Painting extends Base_Object{
-    constructor(x, y, z){
-        super();
-        createPainting(this, x, y, z);
-    }
-    myType(){
-        return "Painting";
-    }
-}
-class Icosaedro extends Base_Object{
-    constructor(x, y, z){
-        super();
-        createIcosaedro(this,x,y,z);
-    }
-    myType(){
-        return "Icosaedro";
-    }
-}
 
 
 
 
 function addGroundWall(obj, x, y, z) {
   'use strict';
-  geometry = new THREE.CubeGeometry(80, 0, 80);
+  geometry = new THREE.CubeGeometry(80, 2, 80);
   mesh = new THREE.Mesh(geometry, material);
   mesh.position.set(x, y, z);
   obj.add(mesh);
@@ -82,6 +153,14 @@ function addBackWall(obj, x, y, z) {
     mesh = new THREE.Mesh(geometry, material);
     mesh.position.set(x, y, z);
     obj.add(mesh);
+}
+
+function addSideWall(obj, x, y, z) {
+  'use strict';
+  geometry = new THREE.CubeGeometry(2, 60, 80);
+  mesh = new THREE.Mesh(geometry, material);
+  mesh.position.set(x, y, z);
+  obj.add(mesh);
 }
 
 function addPedestalLeg(obj, x, y, z) {
@@ -100,25 +179,26 @@ function addPedestalTop(obj,x,y,z){
     mesh = new THREE.Mesh(geometry, material);
     mesh.position.set(x, y, z);
     obj.add(mesh);
-   
+
 }
 
-function createWall(table, x, y, z) {
+function createWall(obj, x, y, z) {
     'use strict';
 
 
     material = new THREE.MeshBasicMaterial({ color: 0xFFFFFF, wireframe: wires });
-    addGroundWall(table, 0, 0, 40);
-    addBackWall(table, 0, 30, 1);
-    addPedestalLeg(table, 10, 10, 55);
-    addPedestalTop(table, 10, 20, 55);
-    table.position.x = x;
-    table.position.y = y;
-    table.position.z = z;
-    grupo.add(table);
+    addGroundWall(obj, 0, 0, 40);
+    addBackWall(obj, 0, 30, 1);
+    addSideWall(obj, -40, 30, 40);
+    addPedestalLeg(obj, 70, 10, 45);
+    addPedestalTop(obj, 70, 20, 45);
+    obj.position.x = x;
+    obj.position.y = y;
+    obj.position.z = z;
+    grupo.add(obj);
 }
 
-function addHolofoteArtic(obj, x, y, z){
+function addSpotlightArtic(obj, x, y, z){
 
     geometry = new THREE.SphereBufferGeometry(3.9, 8, 6, 0, 2*Math.PI, -Math.PI/2, 0.5 * Math.PI);
     material.side = THREE.DoubleSide;
@@ -128,7 +208,7 @@ function addHolofoteArtic(obj, x, y, z){
 
 }
 
-function addHolofoteCone(obj, x, y, z) {
+function addSpotlightCone(obj, x, y, z) {
     'use strict';
 
     geometry = new THREE.CylinderGeometry(4, 0, 10, 22, 0, true);
@@ -139,13 +219,14 @@ function addHolofoteCone(obj, x, y, z) {
     obj.add(mesh);
 }
 
-function createHolofote(index, x, y, z) {
+function createSpotlight(index, x, y, z) {
     'use strict';
 
 
     material = new THREE.MeshBasicMaterial({ color: 0x1E90FF, wireframe: wires });
-    addHolofoteCone(index, 0, 10, 0);
-    addHolofoteArtic(index, 0, 14, 0);
+    //material = new THREE.MeshLambertMaterial( { color:0xff0000} );
+    addSpotlightCone(index, 0, 10, 0);
+    addSpotlightArtic(index, 0, 14, 0);
 
     index.rotation.z = Math.PI/2;
     index.rotation.y = -Math.PI/2;
@@ -154,11 +235,16 @@ function createHolofote(index, x, y, z) {
     index.position.z = z;
     grupo.add(index);
 }
+function onOroffLight(){
+  var state = !directional_light.visible;
+  directional_light.visible = state;
+}
 
-function createPainting(obj,x,y,z){
-    'use strict';
-
-    addSquares(obj);
+function initMaterials(){
+    material_array = new Array(3);
+    material_array[0] = new THREE.MeshBasicMaterial({ color: 0xFFFFFF, wireframe: wires });
+    material_array[1] = new THREE.MeshLambertMaterial({ color: 0xFFFFFF});
+    material_array[2] = new THREE.MeshPhongMaterial({ color: 0xFFFFFF, shininess: 30 });
 }
 
 function createFace(faces, v0, v1, v2) {
@@ -214,20 +300,29 @@ function createIcosaedro(obj,x,y,z){
     grupo.add(obj)
 }
 
+
 function createScene() {
     'use strict';
 
     scene = new THREE.Scene();
 
     scene.add(new THREE.AxisHelper(100));
+    initMaterials();
+
+    new Painting(0,30,3);
 
     new Wall(0,0,0);
-    new Holofote(-25, 25, 30);
-    new Holofote(-10, 25, 30);
-    new Holofote(5, 25, 30);
-    new Holofote(20, 25, 30);
-    new Icosaedro(10,20,55);
+    new Spotlight(-25, 25, 30);
+    new Spotlight(-10, 25, 30);
+    new Spotlight(5, 25, 30);
+    new Spotlight(20, 25, 30);
+    directional_light = new THREE.DirectionalLight(0xffffff, 1);
+    directional_light.position.set(0, 20, 50);
+    directional_light.castShadow = true;
+    scene.add(directional_light);
     scene.add(grupo);
+    //directional_light.target = grupo.children[1];
+    //console.log(grupo.children[1]);
 
 }
 
@@ -239,8 +334,8 @@ function createCamera() {
 
 
     camera1[0].position.x =0;
-    camera1[0].position.y = 140;
-    camera1[0].position.z = 0;
+    camera1[0].position.y = 0;
+    camera1[0].position.z = 7;
     camera1[0].lookAt(scene.position);
 }
 
@@ -248,12 +343,12 @@ function createCamera() {
 function createCamera2() {
   'use strict';
 
-  camera1[1] = new THREE.PerspectiveCamera( 45, 1920/1080, 1, 1000);
+  camera1[1] = new THREE.PerspectiveCamera( 65, 1920/1080, 1, 1000);
 
 
-  camera1[1].position.x = 40;
+  camera1[1].position.x = 50;
   camera1[1].position.y = 40;
-  camera1[1].position.z = 100;
+  camera1[1].position.z = 200;
   camera1[1].lookAt(scene.position);
 }
 function switch_camera(number) {
@@ -288,7 +383,7 @@ function onKeyDown(e) {
           }
         }
         break;
-    case 49: //1
+    case 54: //1
         switch_camera(0);
         break;
 
@@ -296,17 +391,24 @@ function onKeyDown(e) {
         switch_camera(1);
         break;
     case 37://left arrow
-        selected_cannon.toggleLeftMovement();
         break
     case 39://right arrow
-        selected_cannon.toggleRightMovement();
+        if(material_counter < 2)
+          material_counter++;
+        else {
+          material_counter = 0;
+        }
+        console.log(material_counter);
+        for(var i = 0; i < grupo.children.length; i++){
+          for (var j = 0; j < grupo.children[i].children.length; j++){
+            grupo.children[i].children[j].material = material_array[material_counter];
+          }
+        }
         break
-
     case 69:  //E
-          right_cannon.toggleSelectedCannon();
           break;
     case 81: //Q
-          left_cannon.toggleSelectedCannon();
+          onOroffLight();
           break;
     case 82: //r
         if(Axistf){

@@ -42,7 +42,7 @@ class Base_Object extends THREE.Object3D{
 		var oldpos = new THREE.Vector3().copy(this.position);
 
 		// v = a * delta; limits velocity within a maximum and minimum value
-		var nvel = (oldvel.addScaledVector(this.aceleration , delta)).clamp(this.minvelocity, this.maxvelocity);
+		var nvel = (oldvel.addScaledVector(this.aceleration , (-delta))).clamp(this.minvelocity, this.maxvelocity);
 		// x = x0 + v
 		var npos = oldpos.add(nvel);
 
@@ -171,11 +171,11 @@ class Ball extends Base_Object {
     super();
     this.x_limit = 8;
 		this.z_limit = 8;
-		this.radius = 4;
-    this.velocity.set( (2 * Math.random() ) - 1 , 0  , (2 * Math.random() )-1).normalize().multiplyScalar(0.5);
+		this.radius = 4.2;
+    this.velocity.set( (50 * Math.random() )  , 0  , (50 * Math.random() )).normalize().multiplyScalar(1);
     //this.aceleration.set(0, 0, 0);
-    this.maxvelocity.set(1,1,1);
-    this.minvelocity.set(-1,-1,-1);
+    this.maxvelocity.set(10,10,10);
+    this.minvelocity.set(-5,-5,-5);
     this.index = Axiscont;
     Axisvec[this.index] = new THREE.AxisHelper(7);
     Axiscont ++;
@@ -207,12 +207,14 @@ class Ball extends Base_Object {
 		if(obj.myType() == "Ball"){
       var aux = this.velocity;
       this.velocity = obj.velocity;
+      //console.log(aux);
       this.maxvelocity.set(0.02,0, 0.02);
-			obj.velocity= aux;
+      //this.minvelocity.set(-0.02,0,-0.02);
+      obj.velocity= aux;
 		}
 		//Ball-FinalWall collision should make Ball dissapear
 		if(obj.myType() == "Wall" && obj.mesh.material.color == 0xFF0000){
-      //console.log("kapap");
+      console.log(obj.myType());
 			objectsgroup.remove(this);
 		}
   }
@@ -432,7 +434,7 @@ function createScene() {
 
     scene = new THREE.Scene();
 
-    scene.add(new THREE.AxisHelper(100));
+    //scene.add(new THREE.AxisHelper(100));
 
 
     new Wall(0,0,0);
