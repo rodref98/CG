@@ -10,7 +10,7 @@ var geometry, material, mesh;
 var spaceship;
 var spaceshipmat;
 var grupo = new THREE.Group();
-var directional_light;
+var directional_light,spotlight1,spotlight2,spotlight3,spotlight4;
 var material_array;
 var mSpotlight_array = new Array(3);
 var mPedestal_array = new Array(3);
@@ -109,9 +109,10 @@ class Pedestal extends Base_Object {
 }
 
 class Spotlight extends Base_Object {
-  constructor(x, y, z){
+  constructor(x, y, z, tx, ty, tz){
     super();
-    createSpotlight(this, x, y, z);
+    this.spotlight = new THREE.SpotLight(0xffffff);
+    createSpotlight(this, x, y, z, tx, ty, tz);
   }
 
   myType(){
@@ -268,6 +269,9 @@ function createWall(obj, x, y, z) {
   addGroundWall(obj, 0, 0, 40);
   addBackWall(obj, 0, 30, 1);
   addSideWall(obj, -40, 30, 40);
+
+  obj.receiveShadow = true;
+
   obj.position.x = x;
   obj.position.y = y;
   obj.position.z = z;
@@ -299,8 +303,12 @@ function addPedestalTop(obj,x,y,z){
 function createPedestal(obj, x, y, z) {
     'use strict';
 
-    addPedestalLeg(obj, 70, 10, 45);
-    addPedestalTop(obj, 70, 20, 45);
+    addPedestalLeg(obj, 30, 10, 55);
+    addPedestalTop(obj, 30, 20, 55);
+
+    obj.castShadow = true;
+    obj.receiveShadow = false;
+
     obj.position.x = x;
     obj.position.y = y;
     obj.position.z = z;
@@ -329,7 +337,7 @@ function addSpotlightCone(obj, x, y, z) {
     obj.add(mesh);
 }
 
-function createSpotlight(index, x, y, z) {
+function createSpotlight(index, x, y, z, tx, ty, tz) {
     'use strict';
 
 
@@ -340,6 +348,24 @@ function createSpotlight(index, x, y, z) {
     //material = new THREE.MeshLambertMaterial( { color:0xff0000} );
     addSpotlightCone(index, 0, 10, 0);
     addSpotlightArtic(index, 0, 14, 0);
+
+    index.spotlight.position.set (x,y,z-10);
+    index.spotlight.target.position.set(tx,ty,tz);
+    index.spotlight.angle = 0.8;
+    index.spotlight.intensity = 0.6;
+    index.spotlight.penumbra = 0.2;
+    index.spotlight.decay = 2;
+
+    index.spotlight.castShadow = true;
+    index.spotlight.shadow.camera.near = 0.5;
+    index.spotlight.shadow.camera.far = 500;
+    index.spotlight.shadow.camera.fov = 30;
+
+    index.spotlight.shadow.mapSize.width = 512;
+    index.spotlight.shadow.mapSize.height = 512;
+    scene.add(index.spotlight.target);
+    scene.add(index.spotlight);
+
 
     index.rotation.z = Math.PI/2;
     index.rotation.y = -Math.PI/2;
@@ -523,10 +549,10 @@ function createScene() {
     new Pedestal(-40, 0, 0);
     new Triangle(20,0,20);
     new Wall(0,0,0);
-    new Spotlight(-25, 25, 30);
-    new Spotlight(-10, 25, 30);
-    new Spotlight(5, 25, 30);
-    new Spotlight(20, 25, 30);
+    spotlight1 = new Spotlight(0, 55, 60, 0, 30, 0);
+    spotlight2 = new Spotlight(100, 40, 30, 70, 20, 45);
+    spotlight3 = new Spotlight(5, 25, 30, 10 , 10, 10);
+    spotlight4 = new Spotlight(20, 25, 30, 10 ,10 ,10);
     createSpaceship(0,0,0);
     directional_light = new THREE.DirectionalLight(0xffffff, 1);
     directional_light.position.set(40, 80, 60);
@@ -610,11 +636,29 @@ function onKeyDown(e) {
           }
         }
         break;
-    case 54: //1
-        switch_camera(0);
+    case 49: //1
+        var state = !spotlight1.spotlight.visible;
+        spotlight1.spotlight.visible = state;
         break;
 
     case 50: //2
+        var state = !spotlight2.spotlight.visible;
+        spotlight2.spotlight.visible = state;
+        break;
+    case 51: //3
+        var state = !spotlight3.spotlight.visible;
+        spotlight3.spotlight.visible = state;
+        break;
+    case 52: //4
+        var state = !spotlight4.spotlight.visible;
+        spotlight4.spotlight.visible = state;
+        break;
+
+    case 54: //6
+        switch_camera(0);
+        break;
+
+    case 53: //5
         switch_camera(1);
         break;
     case 37://left arrow
