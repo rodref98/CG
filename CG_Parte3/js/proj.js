@@ -25,8 +25,46 @@ class Base_Object extends THREE.Object3D{
     super();
 	}
 
+  calcLight(){
+    if(this.myType() != "Painting" && this.myType() != "Spotlight" && this.myType() != "Pedestal" && this.myType() != "Spaceship"){
+      for (var j = 0; j < this.children.length; j++){
+        this.children[j].material = material_array[0];
+      }
+    }
+    else if(this.myType() == "Spotlight"){
+      for (var j = 0; j < this.children.length; j++){
+        this.children[j].material = mSpotlight_array[0];
+      }
+    }
+    else if(this.myType() == "Pedestal"){
+      this.children[0].material = mPedestal_array[0];
+      this.children[1].material = mPedestal_array[0];
+    }
+    else if(this.myType() == "Painting"){
+      console.log(this.children.length);
+      for (var j = 0; j < this.children.length; j++){
+        if(j == 0) {
+            this.children[j].material = mFrame_array[0];
+          }
+        else if(j == 1){
+            this.children[j].material = mBackground_array[0];
+          }
+        else if(j > 1 && j < 47){
+            this.children[j].material = mCubes_array[0];
+          }
+        else {
+            this.children[j].material = mCyllinders_array[0];
+          }
+      }
+
+    }
+    else if(this.myType() == "Spaceship"){
+      this.children[0].material = spaceshipmat[0];
+    }
+    material_counter = 0;
+  }
   changeMaterial(){
-    if(this.myType() != "Painting" && this.myType() != "Spotlight" && this.myType() != "Pedestal"){
+    if(this.myType() != "Painting" && this.myType() != "Spotlight" && this.myType() != "Pedestal" && this.myType() != "Spaceship"){
       for (var j = 0; j < this.children.length; j++){
         this.children[j].material = material_array[material_counter];
       }
@@ -56,8 +94,10 @@ class Base_Object extends THREE.Object3D{
             this.children[j].material = mCyllinders_array[material_counter];
           }
       }
-
     }
+      else if(this.myType() == "Spaceship"){
+        this.children[0].material = spaceshipmat[material_counter];
+      }
   }
 
   changeLightMaterial(){
@@ -283,7 +323,6 @@ function addPedestalLeg(obj, x, y, z) {
     mPedestal_array[2] = new THREE.MeshPhongMaterial({ color: 0x1E90FF, shininess: 50 });
     geometry = new THREE.CubeGeometry(3, 20, 3);
     mesh = new THREE.Mesh(geometry, material);
-    mesh.castShadow = true;
     mesh.position.set(x, y, z);
     mesh.castShadow = true;
     obj.add(mesh);
@@ -294,7 +333,6 @@ function addPedestalTop(obj,x,y,z){
     material = new THREE.MeshBasicMaterial({ color: 0x1E90FF, wireframe: wires });
     geometry = new THREE.CubeGeometry(12, 1, 12);
     mesh = new THREE.Mesh(geometry, material);
-    mesh.castShadow = true;
     mesh.position.set(x, y, z);
     mesh.castShadow = true;
     obj.add(mesh);
@@ -389,9 +427,9 @@ function initMaterials(){
     material_array[2] = new THREE.MeshPhongMaterial({ color: 0xFFFFFF, shininess: 50 });
 
     spaceshipmat = new Array(3);
-	  spaceshipmat[0] = new THREE.MeshBasicMaterial( {color: 0x00ff00, wireframe: wires });
-	  spaceshipmat[1] = new THREE.MeshLambertMaterial( {color: 0x00ff00, wireframe: wires });
-	  spaceshipmat[2] = new THREE.MeshPhongMaterial( {color: 0x00ff00, wireframe: wires , shininess: 100});
+	  spaceshipmat[0] = new THREE.MeshBasicMaterial( {color: 0x00ff00, wireframe: !wires });
+	  spaceshipmat[1] = new THREE.MeshLambertMaterial( {color: 0x00ff00});
+	  spaceshipmat[2] = new THREE.MeshPhongMaterial( {color: 0x00ff00, shininess: 100});
 }
 
 
@@ -403,7 +441,7 @@ function customSpaceship() {
 	var vertex = [];
 
 
-	createVertexGroup(vertex, 0, 4, 0, 4, 0, 2); 
+	createVertexGroup(vertex, 0, 4, 0, 4, 0, 2);
 	createVertexGroup(vertex, 0, 6, 0, 4, 1, -1);
   createVertexGroup(vertex, 0, 4, 0, 4, 0, 3);
   createVertexGroup(vertex, -1, 0, 4, 8, 0, 2);
@@ -420,25 +458,25 @@ function customSpaceship() {
 	createFace(faces, 0, 2, 8); 	//Left  3
   createFace(faces, 0, 7, 16);	//Front 5
   createFace(faces, 0, 8, 16);	//Right 4
-  
-	
-  
-  
+
+
+
+
   //Parte central
-  
+
   createFace(faces, 1, 2, 20);	//Back-Left
 	createFace(faces, 1, 7, 24);	//Back-Right*/
   createFace(faces, 2, 8, 36);	//Top
   createFace(faces, 7, 16, 30);		//Bottom
 	createFace(faces, 8, 16, 42); 	//Left
-  
+
   createFace(faces, 1, 24, 20);	//Right
 	createFace(faces, 2, 20, 36);	//Back-Left
 	createFace(faces, 8, 36, 42);	//Back-Right
   createFace(faces, 16, 30, 42); //Bottom
   createFace(faces, 7, 24, 30); //Bottom
-  
-  
+
+
   // Parte de cima
 	createFace(faces, 30, 48, 42); //Top
 	createFace(faces, 36, 48, 42); //Left
@@ -464,8 +502,9 @@ function createSpaceship(spaceship, x, y, z) {
 	var geo = customSpaceship();
 	//var geo = mergeMeshes(meshes);
 	//geo.computeFaceNormals();
-  var mesh = new THREE.Mesh(geo, spaceshipmat[0]);
-  spaceship.castShadow = true;
+  var spaceshipmaterial = new THREE.MeshBasicMaterial( {color: 0x00ff00, wireframe: wires });
+  var mesh = new THREE.Mesh(geo, spaceshipmaterial);
+  mesh.castShadow = true;
 	spaceship.add(mesh);
 
 	spaceship.position.x = x;
@@ -508,13 +547,13 @@ function createVertexGroup(vertex, x0, x1, y0, y1, z0, z1) {
 
 
 
+function toggleWireframe() {
+	wires = !wires;
 
-
-
-
-
-
-
+	for (var mat of spaceshipmat) {
+		mat.wireframe = wires;
+	}
+}
 
 
 
@@ -523,14 +562,13 @@ function createScene() {
 
     scene = new THREE.Scene();
 
-    scene.add(new THREE.AxisHelper(100));
     initMaterials();
 
     var painting = new Painting(0,30,3);
     new Pedestal(-40, 0, 0);
     //new Triangle(20,0,20);
     new Wall(0,0,0);
-    spotlight1 = new Spotlight(0, 30, 80, 0, 30, 0);
+    spotlight1 = new Spotlight(20, 20, 100, 0, 30, 0);
     spotlight1.rotateX(Math.PI/12);
     spotlight2 = new Spotlight(100, 40, 30, 70, 20, 20);
     spotlight2.rotateX(Math.PI/3);
@@ -545,11 +583,9 @@ function createScene() {
     directional_light.target.position.set(0, 30, 0);
     directional_light.target.updateMatrixWorld();
     directional_light.castShadow = true;
-    var helper = new THREE.DirectionalLightHelper( directional_light, 5 );
 
     scene.add(grupo);
     scene.add(directional_light, directional_light.target);
-    scene.add( helper );
     //directional_light.target = grupo.children[1];
     //console.log(grupo.children[1]);
 
@@ -654,6 +690,7 @@ function onKeyDown(e) {
         switch_camera(2);
         break
     case 69:  //E
+          toggleWireframe();
           break;
     case 71: //G
           if(material_counter < 2)
@@ -663,7 +700,7 @@ function onKeyDown(e) {
           }
           console.log(material_counter);
           //Meti -1 por causa do triangulo
-          for(var i = 0; i < grupo.children.length-1; i++){
+          for(var i = 0; i < grupo.children.length; i++){
             grupo.children[i].changeMaterial();
           }
           break
@@ -673,6 +710,9 @@ function onKeyDown(e) {
     case 82: //r
           break;
     case 87: //w
+          for(var i = 0; i < grupo.children.length; i++){
+            grupo.children[i].calcLight();
+          }
           break;
     }
 }
