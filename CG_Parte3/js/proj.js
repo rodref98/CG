@@ -29,13 +29,11 @@ class Base_Object extends THREE.Object3D{
     if(this.myType() != "Painting" && this.myType() != "Spotlight" && this.myType() != "Pedestal"){
       for (var j = 0; j < this.children.length; j++){
         this.children[j].material = material_array[material_counter];
-        this.children[j].receiveShadow = true;
       }
     }
     else if(this.myType() == "Spotlight"){
       for (var j = 0; j < this.children.length; j++){
         this.children[j].material = mSpotlight_array[material_counter];
-        this.children[j].castShadow = true;
       }
     }
     else if(this.myType() == "Pedestal"){
@@ -49,15 +47,12 @@ class Base_Object extends THREE.Object3D{
             this.children[j].material = mFrame_array[material_counter];
           }
         else if(j == 1){
-            this.children[j].castShadow = false;
             this.children[j].material = mBackground_array[material_counter];
           }
         else if(j > 1 && j < 47){
-            this.children[j].castShadow = false;
             this.children[j].material = mCubes_array[material_counter];
           }
         else {
-            this.children[j].castShadow = false;
             this.children[j].material = mCyllinders_array[material_counter];
           }
       }
@@ -89,7 +84,6 @@ class Wall extends Base_Object {
   constructor(x, y, z){
     super();
     createWall(this, x, y, z);
-    this.receiveShadow = true;
   }
 
   myType(){
@@ -270,8 +264,6 @@ function createWall(obj, x, y, z) {
   addBackWall(obj, 0, 30, 1);
   addSideWall(obj, -40, 30, 40);
 
-  obj.receiveShadow = true;
-
   obj.position.x = x;
   obj.position.y = y;
   obj.position.z = z;
@@ -306,8 +298,6 @@ function createPedestal(obj, x, y, z) {
     addPedestalLeg(obj, 30, 10, 55);
     addPedestalTop(obj, 30, 20, 55);
 
-    obj.castShadow = true;
-    obj.receiveShadow = false;
 
     obj.position.x = x;
     obj.position.y = y;
@@ -627,15 +617,6 @@ function onKeyDown(e) {
     'use strict';
 
     switch (e.keyCode) {
-      case 52: //4
-        wires = !wires;
-        //console.log(grupo.lenght);
-        for(var i = 0; i < grupo.children.length; i++){
-          for (var j = 0; j < grupo.children[i].children.length; j++){
-            grupo.children[i].children[j].material.wireframe= wires;
-          }
-        }
-        break;
     case 49: //1
         var state = !spotlight1.spotlight.visible;
         spotlight1.spotlight.visible = state;
@@ -660,6 +641,15 @@ function onKeyDown(e) {
 
     case 53: //5
         switch_camera(1);
+        break;
+    case 55://7
+        wires = !wires;
+        //console.log(grupo.lenght);
+        for(var i = 0; i < grupo.children.length; i++){
+          for (var j = 0; j < grupo.children[i].children.length; j++){
+            grupo.children[i].children[j].material.wireframe= wires;
+          }
+        }
         break;
     case 37://left arrow
         break
