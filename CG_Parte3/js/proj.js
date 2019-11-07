@@ -166,6 +166,7 @@ function addFrame(obj,x,y,z){
     mFrame_array[2] = new THREE.MeshPhongMaterial({ color: 0xB8860B, shininess: 50 });
     mesh = new THREE.Mesh(geometry, material);
     mesh.position.set(x, y, z);
+    mesh.castShadow = true;
     obj.add(mesh);
 
 }
@@ -236,6 +237,7 @@ function addGroundWall(obj, x, y, z) {
   geometry = new THREE.CubeGeometry(80, 2, 80);
   mesh = new THREE.Mesh(geometry, material);
   mesh.position.set(x, y, z);
+  mesh.receiveShadow = true;
   obj.add(mesh);
 }
 
@@ -274,20 +276,22 @@ function addPedestalLeg(obj, x, y, z) {
     'use strict';
     material = new THREE.MeshBasicMaterial({ color: 0x1E90FF, wireframe: wires });
     mPedestal_array[0] = new THREE.MeshBasicMaterial({ color: 0x1E90FF, wireframe: !wires });
-    mPedestal_array[1] = new THREE.MeshLambertMaterial({color: 0x1E90FF})
+    mPedestal_array[1] = new THREE.MeshLambertMaterial({color: 0x1E90FF })
     mPedestal_array[2] = new THREE.MeshPhongMaterial({ color: 0x1E90FF, shininess: 50 });
     geometry = new THREE.CubeGeometry(3, 20, 3);
     mesh = new THREE.Mesh(geometry, material);
     mesh.position.set(x, y, z);
+    mesh.castShadow = true;
     obj.add(mesh);
 }
 
 function addPedestalTop(obj,x,y,z){
     'use strict';
-    material = new THREE.MeshBasicMaterial({ color: 0x1E90FF, wireframe: !wires });
+    material = new THREE.MeshBasicMaterial({ color: 0x1E90FF, wireframe: wires });
     geometry = new THREE.CubeGeometry(12, 1, 12);
     mesh = new THREE.Mesh(geometry, material);
     mesh.position.set(x, y, z);
+    mesh.castShadow = true;
     obj.add(mesh);
 
 }
@@ -645,8 +649,9 @@ function onKeyDown(e) {
     case 55://7
         wires = !wires;
         //console.log(grupo.lenght);
-        for(var i = 0; i < grupo.children.length; i++){
+        for(var i = 0; i < grupo.children.length-1; i++){
           for (var j = 0; j < grupo.children[i].children.length; j++){
+            //console.log(grupo.children[i].myType());
             grupo.children[i].children[j].material.wireframe= wires;
           }
         }
