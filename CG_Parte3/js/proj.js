@@ -4,12 +4,12 @@
 var camera1 = new Array(2);
 var active_camera = 0;
 
-var spaceshipmovement = true;
+var sculpturemovement = true;
 var scene, renderer;
 var wires = true;
 var geometry, material, mesh;
-var spaceship;
-var spaceshipmat;
+var sculpture;
+var sculpturemat;
 var grupo = new THREE.Group();
 var directional_light,spotlight1,spotlight2,spotlight3,spotlight4;
 var material_array;
@@ -27,7 +27,7 @@ class Base_Object extends THREE.Object3D{
 	}
 
   calcLight(){
-    if(this.myType() != "Painting" && this.myType() != "Spotlight" && this.myType() != "Pedestal" && this.myType() != "Spaceship"){
+    if(this.myType() != "Painting" && this.myType() != "Spotlight" && this.myType() != "Pedestal" && this.myType() != "Sculpture"){
       for (var j = 0; j < this.children.length; j++){
         this.children[j].material = material_array[0];
       }
@@ -59,13 +59,13 @@ class Base_Object extends THREE.Object3D{
       }
 
     }
-    else if(this.myType() == "Spaceship"){
-      this.children[0].material = spaceshipmat[0];
+    else if(this.myType() == "Sculpture"){
+      this.children[0].material = sculpturemat[0];
     }
     material_counter = 0;
   }
   changeMaterial(){
-    if(this.myType() != "Painting" && this.myType() != "Spotlight" && this.myType() != "Pedestal" && this.myType() != "Spaceship"){
+    if(this.myType() != "Painting" && this.myType() != "Spotlight" && this.myType() != "Pedestal" && this.myType() != "Sculpture"){
       for (var j = 0; j < this.children.length; j++){
         this.children[j].material = material_array[material_counter];
       }
@@ -96,8 +96,8 @@ class Base_Object extends THREE.Object3D{
           }
       }
     }
-      else if(this.myType() == "Spaceship"){
-        this.children[0].material = spaceshipmat[material_counter];
+      else if(this.myType() == "Sculpture"){
+        this.children[0].material = sculpturemat[material_counter];
       }
   }
 
@@ -156,14 +156,14 @@ class Spotlight extends Base_Object {
 
 }
 
-class Spaceship extends Base_Object {
+class Sculpture extends Base_Object {
   constructor(x, y, z){
     super();
-    createSpaceship(this, x, y, z);
+    createSculpture(this, x, y, z);
   }
 
   myType(){
-    return "Spaceship";
+    return "Sculpture";
   }
 
 }
@@ -427,16 +427,16 @@ function initMaterials(){
     material_array[1] = new THREE.MeshLambertMaterial({ color: 0xFFFFFF});
     material_array[2] = new THREE.MeshPhongMaterial({ color: 0xFFFFFF, shininess: 50 });
 
-    spaceshipmat = new Array(3);
-	  spaceshipmat[0] = new THREE.MeshBasicMaterial( {color: 0x00ff00, wireframe: !wires });
-	  spaceshipmat[1] = new THREE.MeshLambertMaterial( {color: 0x00ff00});
-	  spaceshipmat[2] = new THREE.MeshPhongMaterial( {color: 0x00ff00, shininess: 100});
+    sculpturemat = new Array(3);
+	  sculpturemat[0] = new THREE.MeshBasicMaterial( {color: 0x00ff00, wireframe: !wires });
+	  sculpturemat[1] = new THREE.MeshLambertMaterial( {color: 0x00ff00});
+	  sculpturemat[2] = new THREE.MeshPhongMaterial( {color: 0x00ff00, shininess: 100});
 }
 
 
 
 
-function customSpaceship() {
+function customSculpture() {
 	var geo = new THREE.Geometry();
 
 	var vertex = [];
@@ -493,26 +493,26 @@ function customSpaceship() {
 	return geo;
 }
 
-function createSpaceship(spaceship, x, y, z) {
+function createSculpture(sculpture, x, y, z) {
 
-  //spaceship = new THREE.Object3D();
+  //sculpture = new THREE.Object3D();
 	//var meshes = [];
 
-	//var spaceshipMaterial = spaceshipmat[0];
+	//var sculptureMaterial = sculpturemat[0];
 
-	var geo = customSpaceship();
+	var geo = customSculpture();
 	//var geo = mergeMeshes(meshes);
 	//geo.computeFaceNormals();
-  var spaceshipmaterial = new THREE.MeshBasicMaterial( {color: 0x00ff00, wireframe: wires });
-  var mesh = new THREE.Mesh(geo, spaceshipmaterial);
+  var sculpturematerial = new THREE.MeshBasicMaterial( {color: 0x00ff00, wireframe: wires });
+  var mesh = new THREE.Mesh(geo, sculpturematerial);
   mesh.castShadow = true;
-	spaceship.add(mesh);
+	sculpture.add(mesh);
 
-	spaceship.position.x = x;
-	spaceship.position.y = y;
-	spaceship.position.z = z;
+	sculpture.position.x = x;
+	sculpture.position.y = y;
+	sculpture.position.z = z;
 
-	grupo.add(spaceship);
+	grupo.add(sculpture);
 }
 
 
@@ -551,7 +551,7 @@ function createVertexGroup(vertex, x0, x1, y0, y1, z0, z1) {
 function toggleWireframe() {
 	wires = !wires;
 
-	for (var mat of spaceshipmat) {
+	for (var mat of sculpturemat) {
 		mat.wireframe = wires;
 	}
 }
@@ -578,7 +578,7 @@ function createScene() {
     spotlight4 = new Spotlight(40, 25, 90, 10 ,10 ,0);
     spotlight4.rotateX(Math.PI/12);
 
-    spaceship = new Spaceship(-10,22,55);
+    sculpture = new Sculpture(-10,22,55);
     directional_light = new THREE.DirectionalLight(0xffffff, 1);
     directional_light.position.set(40, 80, 60);
     directional_light.target.position.set(0, 30, 0);
@@ -728,15 +728,15 @@ function onKeyUp(e) {
 	renderer.render(scene, camera1[active_camera]);
 }
 
-function spaceshipMove(){
-  if(spaceshipmovement){
-    spaceship.rotateY(Math.PI/96);
+function sculptureMove(){
+  if(sculpturemovement){
+    sculpture.rotateY(Math.PI/96);
   }
 }
 function animate() {
   //Renders Scene
   requestAnimationFrame(animate);
-  spaceshipMove();
+  sculptureMove();
   render();
 }
 
