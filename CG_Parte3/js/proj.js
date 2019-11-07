@@ -29,11 +29,13 @@ class Base_Object extends THREE.Object3D{
     if(this.myType() != "Painting" && this.myType() != "Spotlight" && this.myType() != "Pedestal"){
       for (var j = 0; j < this.children.length; j++){
         this.children[j].material = material_array[material_counter];
+        this.children[j].receiveShadow = true;
       }
     }
     else if(this.myType() == "Spotlight"){
       for (var j = 0; j < this.children.length; j++){
         this.children[j].material = mSpotlight_array[material_counter];
+        this.children[j].castShadow = true;
       }
     }
     else if(this.myType() == "Pedestal"){
@@ -47,18 +49,24 @@ class Base_Object extends THREE.Object3D{
             this.children[j].material = mFrame_array[material_counter];
           }
         else if(j == 1){
+            this.children[j].castShadow = false;
             this.children[j].material = mBackground_array[material_counter];
           }
         else if(j > 1 && j < 47){
-
+            this.children[j].castShadow = false;
             this.children[j].material = mCubes_array[material_counter];
           }
         else {
+            this.children[j].castShadow = false;
             this.children[j].material = mCyllinders_array[material_counter];
           }
       }
 
     }
+  }
+
+  changeLightMaterial(){
+
   }
 
   myType(){
@@ -81,6 +89,7 @@ class Wall extends Base_Object {
   constructor(x, y, z){
     super();
     createWall(this, x, y, z);
+    this.receiveShadow = true;
   }
 
   myType(){
@@ -511,7 +520,7 @@ function createScene() {
     initMaterials();
 
     var painting = new Painting(0,30,3);
-    new Pedestal(0, 0, 0);
+    new Pedestal(-40, 0, 0);
     new Triangle(20,0,20);
     new Wall(0,0,0);
     new Spotlight(-25, 25, 30);
@@ -520,11 +529,15 @@ function createScene() {
     new Spotlight(20, 25, 30);
     createSpaceship(0,0,0);
     directional_light = new THREE.DirectionalLight(0xffffff, 1);
-    directional_light.position.set(20, 40, 30);
+    directional_light.position.set(40, 80, 60);
+    directional_light.target.position.set(0, 30, 0);
+    directional_light.target.updateMatrixWorld();
     directional_light.castShadow = true;
-    directional_light.target.position.set( 0, 0, 40 );
-    scene.add(directional_light);
+    var helper = new THREE.DirectionalLightHelper( directional_light, 5 );
+
     scene.add(grupo);
+    scene.add(directional_light, directional_light.target);
+    scene.add( helper );
     //directional_light.target = grupo.children[1];
     //console.log(grupo.children[1]);
 
@@ -543,6 +556,8 @@ function createCamera() {
     camera1[0].lookAt(scene.position);
 }
 
+
+
 //Camara lateral
 function createCamera2() {
   'use strict';
@@ -554,6 +569,17 @@ function createCamera2() {
   camera1[1].position.y = 30;
   camera1[1].position.z = 150;
   camera1[1].lookAt(scene.position);
+}
+function createCamera3() {
+  'use strict';
+
+  camera1[2] = new THREE.OrthographicCamera( -100, 100, 70, -70, 1, 1000 );
+
+
+  camera1[2].position.x =100;
+  camera1[2].position.y = 130;
+  camera1[2].position.z = 0;
+  camera1[2].lookAt(scene.position);
 }
 function switch_camera(number) {
 	active_camera = number;
@@ -575,9 +601,6 @@ function onKeyDown(e) {
     'use strict';
 
     switch (e.keyCode) {
-      case 32: //Space
-        selected_cannon.shootBall();
-        break;
       case 52: //4
         wires = !wires;
         //console.log(grupo.lenght);
@@ -597,53 +620,34 @@ function onKeyDown(e) {
     case 37://left arrow
         break
     case 39://right arrow
-        if(material_counter < 2)
-          material_counter++;
-        else {
-          material_counter = 0;
-        }
-        console.log(material_counter);
-        for(var i = 0; i < grupo.children.length; i++){
-          grupo.children[i].changeMaterial();
-        }
+        switch_camera(2);
         break
     case 69:  //E
           break;
+    case 71: //G
+          if(material_counter < 2)
+            material_counter++;
+          else {
+            material_counter = 0;
+          }
+          console.log(material_counter);
+          //Meti -1 por causa do triangulo
+          for(var i = 0; i < grupo.children.length-1; i++){
+            grupo.children[i].changeMaterial();
+          }
+          break
     case 81: //Q
           onOroffLight();
           break;
     case 82: //r
-        if(Axistf){
-          for(var i = 4; i < grupo.children.length; i++){
-            console.log(grupo.children[i]);
-            grupo.children[i].toggleoffAxisHelper();
-          }
-          Axistf = false;
-        }
-        else{
-          for(var i = 4; i < grupo.children.length; i++){
-            //console.log(grupo.children[i]);
-            grupo.children[i].toggleonAxisHelper();
-          }
-          Axistf = true;
-        }
-        break;
+          break;
     case 87: //w
-          middle_cannon.toggleSelectedCannon();
           break;
     }
 }
 
 function onKeyUp(e) {
     switch (e.keyCode) {
-      case 38:
-        moveForward = false;
-        breakFB = true;
-        break;
-      case 40:
-        moveBackwards = false;
-        breakFB = true;
-        break;
 
     }
   }
@@ -664,12 +668,15 @@ function init() {
     renderer = new THREE.WebGLRenderer({
         antialias: true
     });
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
 
     createScene();
     createCamera();
     createCamera2();
+    createCamera3();
     switch_camera(0);
 
 
