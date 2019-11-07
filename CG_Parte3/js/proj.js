@@ -235,6 +235,7 @@ function addGroundWall(obj, x, y, z) {
   'use strict';
   geometry = new THREE.CubeGeometry(80, 2, 80);
   mesh = new THREE.Mesh(geometry, material);
+  mesh.receiveShadow = true;
   mesh.position.set(x, y, z);
   obj.add(mesh);
 }
@@ -243,6 +244,7 @@ function addBackWall(obj, x, y, z) {
     'use strict';
     geometry = new THREE.CubeGeometry(80, 60, 2);
     mesh = new THREE.Mesh(geometry, material);
+    mesh.receiveShadow = true;
     mesh.position.set(x, y, z);
     obj.add(mesh);
 }
@@ -251,6 +253,7 @@ function addSideWall(obj, x, y, z) {
   'use strict';
   geometry = new THREE.CubeGeometry(2, 60, 80);
   mesh = new THREE.Mesh(geometry, material);
+  mesh.receiveShadow = true;
   mesh.position.set(x, y, z);
   obj.add(mesh);
 }
@@ -259,7 +262,7 @@ function createWall(obj, x, y, z) {
   'use strict';
 
 
-  material = new THREE.MeshBasicMaterial({ color: 0xFFFFFF, wireframe: wires });
+  material = new THREE.MeshBasicMaterial({ color: 0xFFFFFF, wireframe: !wires });
   addGroundWall(obj, 0, 0, 40);
   addBackWall(obj, 0, 30, 1);
   addSideWall(obj, -40, 30, 40);
@@ -278,6 +281,7 @@ function addPedestalLeg(obj, x, y, z) {
     mPedestal_array[2] = new THREE.MeshPhongMaterial({ color: 0x1E90FF, shininess: 50 });
     geometry = new THREE.CubeGeometry(3, 20, 3);
     mesh = new THREE.Mesh(geometry, material);
+    mesh.castShadow = true;
     mesh.position.set(x, y, z);
     obj.add(mesh);
 }
@@ -287,6 +291,7 @@ function addPedestalTop(obj,x,y,z){
     material = new THREE.MeshBasicMaterial({ color: 0x1E90FF, wireframe: !wires });
     geometry = new THREE.CubeGeometry(12, 1, 12);
     mesh = new THREE.Mesh(geometry, material);
+    mesh.castShadow = true;
     mesh.position.set(x, y, z);
     obj.add(mesh);
 
