@@ -252,27 +252,6 @@ function addCylinders(obj, x, y, z){
 }
 
 
-
-
-function createTriangle(obj,x,y,z){
-    geometry = new THREE.Geometry();
-    material = new THREE.MeshBasicMaterial({ color: 0xFFFFFF, wireframe: wires });
-    var v1 = new THREE.Vector3(0, 0, 0);
-    var v2 = new THREE.Vector3(0, 0, -30);
-    var v3 = new THREE.Vector3(0, 30, -30);
-    var triangle = new THREE.Triangle(v1, v2, v3);
-    var normal = triangle.normal();
-    geometry.vertices.push(triangle.a);
-    geometry.vertices.push(triangle.b);
-    geometry.vertices.push(triangle.c);
-    geometry.faces.push(new THREE.Face3(0, 1, 2, normal));
-    mesh = new THREE.Mesh(geometry, material);
-    mesh.position.set(x,y,z);
-    scene.add(mesh);
-
-}
-
-
 function addGroundWall(obj, x, y, z) {
   'use strict';
   geometry = new THREE.CubeGeometry(80, 2, 80);
@@ -567,7 +546,6 @@ function createScene() {
 
     var painting = new Painting(0,30,3);
     new Pedestal(-40, 0, 0);
-    //new Triangle(20,0,20);
     new Wall(0,0,0);
     spotlight1 = new Spotlight(20, 20, 100, 0, 30, 0);
     spotlight1.rotateX(Math.PI/12);
@@ -578,7 +556,7 @@ function createScene() {
     spotlight4 = new Spotlight(40, 25, 90, 10 ,10 ,0);
     spotlight4.rotateX(Math.PI/12);
 
-    sculpture = new Sculpture(-10,22,55);
+    sculpture = new Sculpture(-10,20.5,55);
     directional_light = new THREE.DirectionalLight(0xffffff, 1);
     directional_light.position.set(40, 80, 60);
     directional_light.target.position.set(0, 30, 0);
@@ -690,17 +668,16 @@ function onKeyDown(e) {
     case 39://right arrow
         switch_camera(2);
         break
-    case 69:  //E
+    case 71:  //E
           toggleWireframe();
           break;
-    case 71: //G
+    case 69: //G
           if(material_counter < 2)
             material_counter++;
           else {
             material_counter = 0;
           }
           console.log(material_counter);
-          //Meti -1 por causa do triangulo
           for(var i = 0; i < grupo.children.length; i++){
             grupo.children[i].changeMaterial();
           }
