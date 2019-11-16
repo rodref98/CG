@@ -8,17 +8,9 @@ var sculpturemovement = true;
 var scene, renderer;
 var wires = true;
 var geometry, material, mesh;
-var sculpture;
-var sculpturemat;
 var grupo = new THREE.Group();
 var directional_light,spotlight1,spotlight2,spotlight3,spotlight4;
 var material_array;
-var mSpotlight_array = new Array(3);
-var mPedestal_array = new Array(3);
-var mFrame_array = new Array(3);
-var mBackground_array = new Array(3);
-var mCubes_array = new Array(3);
-var mCyllinders_array = new Array(3);
 var material_counter = 0;
 
 class Base_Object extends THREE.Object3D{
@@ -111,15 +103,6 @@ class Base_Object extends THREE.Object3D{
 
 }
 
-class Painting extends Base_Object{
-  constructor(x,y,z){
-    super();
-    createPainting(this, x, y, z);
-  }
-  myType(){
-    return "Painting";
-  }
-}
 
 class Wall extends Base_Object {
   constructor(x, y, z){
@@ -132,16 +115,7 @@ class Wall extends Base_Object {
   }
 }
 
-class Pedestal extends Base_Object {
-  constructor(x, y, z){
-    super();
-    createPedestal(this, x, y, z);
-  }
 
-  myType(){
-    return "Pedestal";
-  }
-}
 
 class Spotlight extends Base_Object {
   constructor(x, y, z, tx, ty, tz){
@@ -156,100 +130,6 @@ class Spotlight extends Base_Object {
 
 }
 
-class Sculpture extends Base_Object {
-  constructor(x, y, z){
-    super();
-    createSculpture(this, x, y, z);
-  }
-
-  myType(){
-    return "Sculpture";
-  }
-
-}
-
-function createPainting(obj,x,y,z){
-  'use strict';
-  var auxx = -24;
-  var auxy = 42;
-  var auxz = 3;
-  addFrame(obj, x, y, z);
-  addBackground(obj, x, y ,z);
-  for(var j = 0; j < 9; j ++){
-    auxy = 42;
-    if(j != 0) auxx += 6;
-    for(var i = 0; i < 5; i++){
-      addCubes(obj, auxx, auxy, auxz);
-      auxy = auxy - 6;
-    }
-  }
-  auxx = -27;
-  auxy = 45;
-  auxz = 5;
-  for(var j = 0; j < 10; j ++){
-    auxy = 45;
-    if(j != 0) auxx += 6;
-    for(var i = 0; i < 6; i++){
-      addCylinders(obj, auxx, auxy, auxz);
-      auxy = auxy - 6;
-    }
-  }
-  grupo.add(obj);
-}
-
-function addFrame(obj,x,y,z){
-  'use strict';
-
-    geometry = new THREE.CubeGeometry(64, 40, 2);
-    material = new THREE.MeshBasicMaterial({ color: 0xB8860B, wireframe : wires});
-    mFrame_array[0] = new THREE.MeshBasicMaterial({ color: 0xB8860B, wireframe: !wires });
-    mFrame_array[1] = new THREE.MeshLambertMaterial({color: 0xB8860B})
-    mFrame_array[2] = new THREE.MeshPhongMaterial({ color: 0xB8860B, shininess: 50 });
-    mesh = new THREE.Mesh(geometry, material);
-    mesh.position.set(x, y, z);
-    mesh.castShadow = true;
-    obj.add(mesh);
-
-}
-
-function addBackground(obj,x,y,z){
-  'use strict';
-    geometry = new THREE.CubeGeometry(56, 32, 2.5);
-    material = new THREE.MeshBasicMaterial({ color: 0xA9A9A9, wireframe : wires});
-    mBackground_array[0] = new THREE.MeshBasicMaterial({ color: 0xA9A9A9, wireframe: !wires });
-    mBackground_array[1] = new THREE.MeshLambertMaterial({color: 0xA9A9A9})
-    mBackground_array[2] = new THREE.MeshPhongMaterial({ color: 0xA9A9A9, shininess: 50 });
-    mesh = new THREE.Mesh(geometry, material);
-    mesh.position.set(x, y, z);
-    obj.add(mesh);
-
-}
-
-function addCubes(obj, x, y, z){
-  'use strict';
-  geometry = new THREE.CubeGeometry(4, 4 , 3);
-  material = new THREE.MeshBasicMaterial({ color: 0x000000, wireframe : wires});
-  mCubes_array[0] = new THREE.MeshBasicMaterial({ color: 0x000000, wireframe: !wires });
-  mCubes_array[1] = new THREE.MeshLambertMaterial({color: 0x000000})
-  mCubes_array[2] = new THREE.MeshPhongMaterial({ color: 0x000000, shininess: 50 });
-  mesh = new THREE.Mesh(geometry, material);
-  mesh.position.set(x, y, z);
-  obj.add(mesh);
-
-}
-function addCylinders(obj, x, y, z){
-  'use strict';
-  geometry = new THREE.CylinderGeometry(1.2, 1.2, 2, 32);
-  material = new THREE.MeshBasicMaterial({ color: 0xFFFFFF, wireframe : wires});
-  mCyllinders_array[0] = new THREE.MeshBasicMaterial({ color: 0xFFFFFF, wireframe: !wires });
-  mCyllinders_array[1] = new THREE.MeshLambertMaterial({color: 0xFFFFFF})
-  mCyllinders_array[2] = new THREE.MeshPhongMaterial({ color: 0xFFFFFF, shininess: 50 });
-  mesh = new THREE.Mesh(geometry, material);
-  mesh.position.set(x, y, z);
-  mesh.rotation.x = Math.PI / 2
-  obj.add(mesh);
-
-}
 
 
 function addGroundWall(obj, x, y, z) {
@@ -295,42 +175,6 @@ function createWall(obj, x, y, z) {
   grupo.add(obj);
 }
 
-function addPedestalLeg(obj, x, y, z) {
-    'use strict';
-    material = new THREE.MeshBasicMaterial({ color: 0x1E90FF, wireframe: wires });
-    mPedestal_array[0] = new THREE.MeshBasicMaterial({ color: 0x1E90FF, wireframe: !wires });
-    mPedestal_array[1] = new THREE.MeshLambertMaterial({color: 0x1E90FF })
-    mPedestal_array[2] = new THREE.MeshPhongMaterial({ color: 0x1E90FF, shininess: 50 });
-    geometry = new THREE.CubeGeometry(3, 20, 3);
-    mesh = new THREE.Mesh(geometry, material);
-    mesh.position.set(x, y, z);
-    mesh.castShadow = true;
-    obj.add(mesh);
-}
-
-function addPedestalTop(obj,x,y,z){
-    'use strict';
-    material = new THREE.MeshBasicMaterial({ color: 0x1E90FF, wireframe: wires });
-    geometry = new THREE.CubeGeometry(12, 1, 12);
-    mesh = new THREE.Mesh(geometry, material);
-    mesh.position.set(x, y, z);
-    mesh.castShadow = true;
-    obj.add(mesh);
-
-}
-
-function createPedestal(obj, x, y, z) {
-    'use strict';
-
-    addPedestalLeg(obj, 30, 10, 55);
-    addPedestalTop(obj, 30, 20, 55);
-
-
-    obj.position.x = x;
-    obj.position.y = y;
-    obj.position.z = z;
-    grupo.add(obj);
-}
 
 
 function addSpotlightArtic(obj, x, y, z){
@@ -415,118 +259,6 @@ function initMaterials(){
 
 
 
-function customSculpture() {
-	var geo = new THREE.Geometry();
-
-	var vertex = [];
-
-
-	createVertexGroup(vertex, 0, 4, 0, 4, 0, 2);
-	createVertexGroup(vertex, 0, 6, 0, 4, 1, -1);
-  createVertexGroup(vertex, 0, 4, 0, 4, 0, 3);
-  createVertexGroup(vertex, -1, 0, 4, 8, 0, 2);
-  createVertexGroup(vertex, 5, 2, 8, 1, 1, 2);
-  createVertexGroup(vertex, 3.5, 5, 8, 1, -2, 2);
-  createVertexGroup(vertex, -5, 2, 8, 1, 1, 2);
-  createVertexGroup(vertex, -3.5, 5, 8, 1, -2, 2);
-  createVertexGroup(vertex, 0, 5, 12, 1, -2, 0);
-	var faces = [];
-
-	// Parte de baixo
-	createFace(faces, 0, 1, 2); 	//Bottom 1
-	createFace(faces, 0, 1, 7); 	//Top  2
-	createFace(faces, 0, 2, 8); 	//Left  3
-  createFace(faces, 0, 7, 16);	//Front 5
-  createFace(faces, 0, 8, 16);	//Right 4
-
-
-
-
-  //Parte central
-
-  createFace(faces, 1, 2, 20);	//Back-Left
-	createFace(faces, 1, 7, 24);	//Back-Right*/
-  createFace(faces, 2, 8, 36);	//Top
-  createFace(faces, 7, 16, 30);		//Bottom
-	createFace(faces, 8, 16, 42); 	//Left
-
-  createFace(faces, 1, 24, 20);	//Right
-	createFace(faces, 2, 20, 36);	//Back-Left
-	createFace(faces, 8, 36, 42);	//Back-Right
-  createFace(faces, 16, 30, 42); //Bottom
-  createFace(faces, 7, 24, 30); //Bottom
-
-
-  // Parte de cima
-	createFace(faces, 30, 48, 42); //Top
-	createFace(faces, 36, 48, 42); //Left
-	createFace(faces, 20, 48, 36); //Right
-	createFace(faces, 20, 48, 24); //Back-Left
-	createFace(faces, 24, 48, 30); //Back-Right
-
-
-	geo.vertices = vertex;
-	geo.faces = faces;
-	geo.computeFaceNormals();
-  geo.computeVertexNormals();
-	return geo;
-}
-
-function createSculpture(sculpture, x, y, z) {
-
-  //sculpture = new THREE.Object3D();
-	//var meshes = [];
-
-	//var sculptureMaterial = sculpturemat[0];
-
-	var geo = customSculpture();
-	//var geo = mergeMeshes(meshes);
-	//geo.computeFaceNormals();
-  var sculpturematerial = new THREE.MeshBasicMaterial( {color: 0x00ff00, wireframe: wires });
-  var mesh = new THREE.Mesh(geo, sculpturematerial);
-  mesh.castShadow = true;
-	sculpture.add(mesh);
-
-	sculpture.position.x = x;
-	sculpture.position.y = y;
-	sculpture.position.z = z;
-
-	grupo.add(sculpture);
-}
-
-
-function createFace(faces, v0, v1, v2) {
-		faces.push(new THREE.Face3(v0, v1, v2));
-}
-
-
-
-function createVertexGroup(vertex, x0, x1, y0, y1, z0, z1) {
-	vertex.push(
-		new THREE.Vector3(x0 , y0, z0),  // v0
-		new THREE.Vector3(x1, y1, z1),   // v1
-		new THREE.Vector3(-x1, y1, z1),  //v2
-
-		new THREE.Vector3(x0, y0, z1), 	// v3
-		new THREE.Vector3(x0, y1, -z1),	// v4
-		new THREE.Vector3(-x1, y0, z1)  // v5
-	);
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 function toggleWireframe() {
 	wires = !wires;
 
@@ -544,19 +276,17 @@ function createScene() {
 
     initMaterials();
 
-    var painting = new Painting(0,30,3);
-    new Pedestal(-40, 0, 0);
     new Wall(0,0,0);
-    spotlight1 = new Spotlight(20, 20, 100, 0, 30, 0);
+    /*spotlight1 = new Spotlight(20, 20, 100, 0, 30, 0);
     spotlight1.rotateX(Math.PI/12);
     spotlight2 = new Spotlight(100, 40, 30, 70, 20, 20);
     spotlight2.rotateX(Math.PI/3);
     spotlight3 = new Spotlight(-30, 25, 90, 10 , 10, 10);
     spotlight3.rotateX(-Math.PI/6);
     spotlight4 = new Spotlight(40, 25, 90, 10 ,10 ,0);
-    spotlight4.rotateX(Math.PI/12);
+    spotlight4.rotateX(Math.PI/12);*/
 
-    sculpture = new Sculpture(-10,20.5,55);
+  
     directional_light = new THREE.DirectionalLight(0xffffff, 1);
     directional_light.position.set(40, 80, 60);
     directional_light.target.position.set(0, 30, 0);
@@ -663,11 +393,6 @@ function onKeyDown(e) {
           }
         }
         break;
-    case 37://left arrow
-        break
-    case 39://right arrow
-        switch_camera(2);
-        break
     case 71:  //E
           toggleWireframe();
           break;
@@ -684,8 +409,6 @@ function onKeyDown(e) {
           break
     case 81: //Q
           onOroffLight();
-          break;
-    case 82: //r
           break;
     case 87: //w
           for(var i = 0; i < grupo.children.length; i++){
