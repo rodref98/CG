@@ -10,6 +10,8 @@ var wires = true;
 var geometry, material, mesh;
 var grupo = new THREE.Group();
 var directional_light,spotlight1,spotlight2,spotlight3,spotlight4;
+var material_array;
+var material_counter = 0;
 
 //Textures
 var chess = 'textures/chess2.png';
@@ -18,6 +20,15 @@ class Base_Object extends THREE.Object3D{
   constructor(){
     super();
 	}
+
+  calcLight(){
+    if(this.myType() != "Painting" && this.myType() != "Spotlight" && this.myType() != "Pedestal" && this.myType() != "Sculpture"){
+      for (var j = 0; j < this.children.length; j++){
+        this.children[j].material = material_array[material_counter];
+      }
+    }
+
+  }
 
   myType(){
     return "Object";
@@ -85,12 +96,22 @@ function toggleWireframe() {
 	}
 }
 
+function initMaterials(){
+  'use strict';
 
+    material_array = new Array(3);
+    var texture = new THREE.TextureLoader().load(chess);
+    material_array[0] = new THREE.MeshBasicMaterial( { map: texture, transparent: true} );
+    material_array[1] = new THREE.MeshLambertMaterial({ map: texture, transparent: true});
+
+
+}
 
 function createScene() {
     'use strict';
 
     scene = new THREE.Scene();
+    initMaterials();
 
     new Wall(0,0,0);
 
@@ -172,21 +193,28 @@ function onKeyDown(e) {
     case 53: //5
         switch_camera(1);
         break;
-    case 55://7
-        wires = !wires;
-        //console.log(grupo.lenght);
-        for(var i = 0; i < grupo.children.length-1; i++){
-          for (var j = 0; j < grupo.children[i].children.length; j++){
-            //console.log(grupo.children[i].myType());
-            grupo.children[i].children[j].material.wireframe= wires;
-          }
-        }
+    case 68: //D
+        onOroffLight();
         break;
-    case 71:  //E
-          toggleWireframe();
+    case 76: //l
+          if(material_counter < 1)
+            material_counter++;
+          else {
+            material_counter = 0;
+          }
+          for(var i = 0; i < grupo.children.length; i++){
+            grupo.children[i].calcLight();
+          }
           break;
-    case 81: //Q
-          onOroffLight();
+    case 87: //W
+          wires = !wires;
+          //console.log(grupo.lenght);
+          for(var i = 0; i < grupo.children.length-1; i++){
+            for (var j = 0; j < grupo.children[i].children.length; j++){
+              //console.log(grupo.children[i].myType());
+              grupo.children[i].children[j].material.wireframe= wires;
+            }
+          }
           break;
     }
 }
@@ -214,7 +242,6 @@ function init() {
     });
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-    renderer.setClearColor("#C4FFEF")
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
 
