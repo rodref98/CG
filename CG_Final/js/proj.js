@@ -9,7 +9,7 @@ var scene, renderer;
 var wires = true;
 var geometry, material, mesh;
 var grupo = new THREE.Group();
-var directional_light,spotlight1,spotlight2,spotlight3,spotlight4;
+var directional_light, point_light;
 var material_array;
 var material_counter = 0;
 
@@ -60,7 +60,7 @@ function addGroundWall(obj, x, y, z) {
   mesh = new THREE.Mesh(geometry, material2);
   //mesh.receiveShadow = true;
   mesh.position.set(x, y, z);
-  //mesh.receiveShadow = true;
+  mesh.receiveShadow = true;
   obj.add(mesh);
 }
 
@@ -77,16 +77,6 @@ function createWall(obj, x, y, z) {
   obj.position.z = z;
   grupo.add(obj);
 }
-
-
-function onOroffLight(){
-  'use strict';
-
-  var state = !directional_light.visible;
-  directional_light.visible = state;
-}
-
-
 
 function toggleWireframe() {
 	wires = !wires;
@@ -115,6 +105,9 @@ function createScene() {
 
     new Wall(0,0,0);
 
+    point_light = new THREE.PointLight(0xffffff, 1, 1);
+    point_light.position.set(0, 20, 10);
+    point_light.castShadow = true;
     directional_light = new THREE.DirectionalLight(0xffffff, 1);
     directional_light.position.set(40, 80, 60);
     directional_light.target.position.set(0, 30, 0);
@@ -122,7 +115,11 @@ function createScene() {
     directional_light.castShadow = true;
 
     scene.add(grupo);
+    scene.add(point_light);
     scene.add(directional_light, directional_light.target);
+    var sphereSize = 1;
+    var pointLightHelper = new THREE.PointLightHelper( point_light, sphereSize );
+    scene.add( pointLightHelper );
     //directional_light.target = grupo.children[1];
     //console.log(grupo.children[1]);
 
@@ -194,7 +191,8 @@ function onKeyDown(e) {
         switch_camera(1);
         break;
     case 68: //D
-        onOroffLight();
+        var state = !directional_light.visible;
+        directional_light.visible = state;
         break;
     case 76: //l
           if(material_counter < 1)
@@ -206,9 +204,13 @@ function onKeyDown(e) {
             grupo.children[i].calcLight();
           }
           break;
+    case 80://P
+          var state = !point_light.visible;
+          point_light.visible = state;
+          break;
     case 87: //W
           wires = !wires;
-          //console.log(grupo.lenght);
+          //console.log(grupo.length);
           for(var i = 0; i < grupo.children.length-1; i++){
             for (var j = 0; j < grupo.children[i].children.length; j++){
               //console.log(grupo.children[i].myType());
