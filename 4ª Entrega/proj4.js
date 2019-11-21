@@ -116,7 +116,7 @@ class GraphicalEntity extends THREE.Object3D{
 	createMaterials2(obj,colorhash,texture,shine){
 		obj.userData={basic:new THREE.MeshBasicMaterial({color: colorhash,wireframe:false, map:new THREE.TextureLoader().load( texture )}),
 						phong: new THREE.MeshPhongMaterial({color:colorhash,wireframe:false, specular:colorhash, shininess:shine,map:new THREE.TextureLoader().load( texture )})}
-	
+
 		matList.push(obj.userData.phong);
 		matList.push(obj.userData.basic);
 	}
@@ -232,7 +232,7 @@ class Message extends GraphicalEntity{
 	createMessage(x,y,z){
 		var msg= new THREE.Object3D();
 		var geometry= new THREE.PlaneGeometry(blado,blado/5.5);
-		var material= new THREE.MeshBasicMaterial({color:0xffffff, wireframe:false, map:new THREE.TextureLoader().load( "textures/pause2.jpg" )});
+		var material= new THREE.MeshBasicMaterial({color:0xffffff, wireframe:false, map:new THREE.TextureLoader().load( "textures/pause_1.jpg" )});
 		var mesh= new THREE.Mesh(geometry,material);
 		msg.add(mesh);
 		msg.position.set(x,y,z);
