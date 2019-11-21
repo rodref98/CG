@@ -25,7 +25,7 @@ var point;//pointlight
 
 var camFactor=150;
 
-var controls;
+
 
 class App{
 
@@ -246,11 +246,11 @@ function onKeyDown(e) {
 		if(e.keyCode==83 || e.keyCode==115){//S s
 			if(pause==0){//se nao estiver em pausa
 				pause=1;
-				controls.enabled=false;
+				
 			}
 			else if(pause==1){//se estiver em pausa
 				pause=0;
-				controls.enabled=true;
+				
 			}
 			onResize();
 		}
@@ -258,8 +258,6 @@ function onKeyDown(e) {
 		if(pause==1){
 			if(e.keyCode==82 || e.keyCode==114){//R r
 				createGame();
-				controls.object=camera1;
-				controls.enabled=true;
 				onResize();
 			}
 		}
@@ -346,7 +344,7 @@ function onResize() {
 		}
 
 
-		controls.update();//sempre que algo mexe nas dimensoes na camera faz-se update aos controls
+		
 
 }
 
@@ -368,7 +366,7 @@ function init() {
 	renderer.setSize(window.innerWidth, window.innerHeight);// definir o tamanho
 	document.body.appendChild(renderer.domElement);//append ao body
 	createGame();
-	controls = new THREE.OrbitControls(camera1);
+	
 	onResize();
 
 	window.addEventListener("resize",onResize);
